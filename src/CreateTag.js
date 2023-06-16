@@ -3,10 +3,26 @@ import { useState, React } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
 import DatePicker from './DatePicker.js';
 import TimePicker from "./TimePicker.js";
-function CreatTag() {
+import axios from "axios";
+
+function CreateTag() {
 
     const [startTime, setStartTime] = useState("09:00");
     const [endTime, setEndTime] = useState("17:00");
+    const [email, setEmail] = useState("");
+    const [tagName, setTagName] = useState("");
+    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+
+    const handleStartDateChange = (value) => {
+        setStartDate(value);
+    };
+
+    const handleEndDateChange = (value) => {
+        setEndDate(value);
+
+
+    };
 
     const handleStartTimeChange = (newTime) => {
         setStartTime(newTime);
@@ -22,21 +38,36 @@ function CreatTag() {
         setInfinitTag(!infinitTag);
     }
 
-    
+    const createTag = async (e) => {
+        e.preventDefault();
 
+        if (email.strip() !== '' && tagName.strip() != '' && startDate.strip() != '' && startTime.strip() != '') {
+            try {
+                const response = await axios.post('https://databoard-1-p3241077.deta.app/tags/create', {
+                    email: email,
+                    tag_name: tagName,
+                    start_date: startDate,
+                    tag_type: infinitTag ? "infinite" : "finite",
+                    start_time: startTime,
+                    end_date: endDate,
+                    end_time: endTime
 
-
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
-
-    const handleStartDateChange = (value) => {
-        setStartDate(value);
-    };
-
-    const handleEndDateChange = (value) => {
-        setEndDate(value);
-    };
-
+                });
+                // Handle response from API
+                if (response.status === 200) {
+                    // Login successful
+                    console.log('Registration successful!');
+                } else {
+                    // Login failed
+                    console.error('Registration failed.');
+                }
+            } catch (error) {
+                console.error('Error during registration:', error);
+            }
+        } else {
+            console.error('Registration failed.');
+        }
+    }
 
     return (
 
@@ -54,7 +85,7 @@ function CreatTag() {
                             <form>
                                 <div className="mb-4">
                                     <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="tag_name">Name</label>
-                                    <input className="appearance-none border h-18 w-full py-4 px-3 text- leading-tight focus:outline-none focus:shadow-outline rounded-md" id="tag_name" type="text" placeholder="Name of tag" />
+                                    <input className="appearance-none border h-18 w-full py-4 px-3 text- leading-tight focus:outline-none focus:shadow-outline rounded-md" id="tag_name" type="text" placeholder="Name of tag" value={tagName} onChange={(e) => setTagName(e.target.value)} />
                                 </div>
                                 <div className="flex items-center my-3">
                                     <label className="inline-flex items-center cursor-pointer">
@@ -84,7 +115,7 @@ function CreatTag() {
                                     <TimePicker label="End Time" value={endTime} onChange={handleEndTimeChange} />
                                 </div>
 
-                                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-light py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-light py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={createTag}>
                                     Create new tag
                                 </button>
 
@@ -99,4 +130,4 @@ function CreatTag() {
     );
 }
 
-export default CreatTag;
+export default CreateTag;
