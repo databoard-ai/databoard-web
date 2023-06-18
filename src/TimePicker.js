@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ClockIcon } from '@heroicons/react/solid';
 
-function TimePicker({ label, value, onChange }) {
+function TimePicker({ label, value, onChange, disabled=false }) {
     const [time, setTime] = useState(value);
   
     const handleTimeChange = (e) => {
@@ -22,9 +22,11 @@ function TimePicker({ label, value, onChange }) {
             name="time"
             value={time}
             onChange={handleTimeChange}
-            className="w-full text-gray-800 appearance-none   focus:outline-none bg-transparent"
+            disabled={disabled}
+            className={disabled?'w-full text-gray-500 appearance-none   focus:outline-none bg-transparent':'w-full text-gray-800 appearance-none   focus:outline-none bg-transparent'}
+            style={disabled ? { pointerEvents: 'none' } : null}
           />
-          <ClockIcon className="w-5 h-5 text-gray-500 ml-2" />
+        
         </div>
       </div>
     );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Flex, Input, InputGroup, Icon, Button, Text, SimpleGrid, useToast, Menu, MenuButton, MenuList, MenuItem, Divider,Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, } from "@chakra-ui/react";
+import { Box, Flex, Input, InputGroup, Icon, Button, Text, SimpleGrid, useToast, Menu, MenuButton, MenuList, MenuItem, Divider,Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter,CircularProgress } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { BiQrScan, BiDotsVertical, BiBookOpen } from "react-icons/bi";
 import { FaInfinity } from "react-icons/fa";
@@ -10,6 +10,7 @@ import axios from "axios";
 import { BsInfoCircle } from 'react-icons/bs';
 import DatePicker from './DatePicker.js';
 import TimePicker from "./TimePicker.js";
+import { useDisclosure } from "@chakra-ui/react";
 
 
 export const Taglist = () => {
@@ -51,6 +52,10 @@ export const Taglist = () => {
 
   function handleInfiniteTagToggle() {
       setInfiniteTag(!infiniteTag);
+      if(infiniteTag===true){
+        setEndDate('');
+        setEndTime('');
+      }
   }
 
   const createTag = async (e) => {
@@ -104,7 +109,7 @@ export const Taglist = () => {
     fetchData();
   }, []);
 
-  const [isOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const openModal = () => {
     setIsModalOpen(true);
@@ -113,6 +118,8 @@ export const Taglist = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
 
   const TagComponent = ({ tag }) => {
@@ -129,69 +136,7 @@ export const Taglist = () => {
 
 
 
-    <Modal isOpen={isOpen} onClose={closeModal} size="lg">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Create an event tag</ModalHeader>
-          <ModalBody>
-          <div className='container mx-auto w-auto md:lg:w-1/2 lg:w-1/4'>
-                    <div className='h-full mx-auto bg-white rounded-sm px-10'>
-                        <div className="    h-full py-24 px-30">
-
-                            <h2 className="text-5xl mb-2 font-montserrat text-dark-text">Create an event tag</h2>
-                            <p className='py-5 font-extralight text-xl  text-dark-text'>Create a tag for your event to help you acess data of your attendees</p>
-                            <form>
-                                <div className="mb-4">
-                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="tag_name">Name</label>
-                                    <input className="appearance-none border h-18 w-full py-4 px-3 text- leading-tight focus:outline-none focus:shadow-outline rounded-md" id="tag_name" type="text" placeholder="Name of tag" value={tagName} onChange={(e) => setTagName(e.target.value)} />
-                                </div>
-                                <div className="flex items-center my-3">
-                                    <label className="inline-flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="form-checkbox h-4 w-4 databoard-blue"
-                                            checked={infiniteTag}
-                                            onChange={handleInfiniteTagToggle}
-                                        />
-                                        <span className="ml-2 text-gray-700 font-extralight">infinite tag</span>
-                                        <span className='ml-4'>
-                                            <BsInfoCircle />
-                                        </span>
-                                    </label>
-
-
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <DatePicker label="Start Date" value={startDate} onChange={handleStartDateChange} />
-                                    <TimePicker label="Start Time" value={startTime} onChange={handleStartTimeChange} />
-
-
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 pb-4">
-
-                                    <DatePicker label="End Date" value={endDate} onChange={handleEndDateChange} />
-                                    <TimePicker label="End Time" value={endTime} onChange={handleEndTimeChange} />
-                                </div>
-
-                                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-light py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={openModal}>
-                                    Create new tag
-                                </button>
-
-                            </form>
-
-
-                        </div>
-                    </div>
-                </div>
-          </ModalBody>
-          <ModalFooter>
-            {/* <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
-              Create new tag
-            </Button> */}
-            <Button onClick={closeModal}>Close</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+ 
     return (
 
       <Box
@@ -271,6 +216,70 @@ export const Taglist = () => {
 
   return (
     <Flex width="full" direction="column">
+         <Modal isOpen={isModalOpen} onClose={closeModal} size="lg" mt="10" zIndex="999999">
+        <ModalOverlay />
+        <ModalContent style={{ top: "5%",
+      transform: "translateY(50%)",
+      position: "fixed",
+      left: "50%",
+      marginLeft: "-200px",}}>
+          {/* <ModalHeader>Create an event tag</ModalHeader> */}
+          <ModalBody>
+           <Flex w="full" direction="row">
+           <div className='container mx-auto w-full md:w-1 lg:w-full'>
+                    <div className='h-full mx-auto bg-white rounded-sm px-10'>
+                        <div className="    h-full py-24 px-30">
+
+                            <h2 className="text-5xl mb-2 font-montserrat text-dark-text">Create an event tag</h2>
+                            <p className='py-5 font-extralight text-xl  text-dark-text'>Create a tag for your event to help you acess the data of your attendees</p>
+                            <form>
+                                <div className="mb-4">
+                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="tag_name">Name</label>
+                                    <input className="appearance-none border h-18 w-full py-4 px-3 text- leading-tight focus:outline-none focus:shadow-outline rounded-md" id="tag_name" type="text" placeholder="Name of tag" value={tagName} onChange={(e) => setTagName(e.target.value)} />
+                                </div>
+                                <div className="flex items-center my-3">
+                                    <label className="inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="form-checkbox h-4 w-4 databoard-blue"
+                                            checked={infiniteTag}
+                                            onChange={handleInfiniteTagToggle}
+                                        />
+                                        <span className="ml-2 text-gray-700 font-extralight">infinite tag</span>
+                                        <span className='ml-4'>
+                                            <BsInfoCircle />
+                                        </span>
+                                    </label>
+
+
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <DatePicker label="Start Date" value={startDate} onChange={handleStartDateChange} />
+                                    <TimePicker label="Start Time" value={startTime} onChange={handleStartTimeChange} />
+
+
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 pb-4">
+
+                                    <DatePicker label="End Date" value={endDate} onChange={handleEndDateChange} disabled={infiniteTag} />
+                                    <TimePicker label="End Time" value={endTime} onChange={handleEndTimeChange} disabled={infiniteTag}/>
+                                </div>
+
+                                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-light py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" >
+                                    Create new tag
+                                </button>
+
+                            </form>
+
+
+                        </div>
+                    </div>
+                </div>
+           </Flex>
+        
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <Box position="sticky" top="0" zIndex={6000}>
         <Flex width="full" px="20px" py="20px" bg="#4283E4" alignItems="flex-end">
           <Flex verticalAlign="center" my={{ base: "10px", sm: "0px" }}>
@@ -316,7 +325,9 @@ export const Taglist = () => {
       </Box>
       <Box height="90vh" bg="#FEFEFE" display="flex" alignItems="" justifyContent="flex-start" p="1em" flexDirection="column">
         {isLoading ?
-          <Text>Loading....</Text> : <SimpleGrid   justifyContent="center"  p={{ base: "8px", sm: "12px" }} spacing={2} minChildWidth={{ base: "8em", sm: "13em", md: "13em", lg: "13em" }} justifyItems="center" >
+            <Flex width="full" height="full" alignItems="center" justifyContent="center">
+            <CircularProgress isIndeterminate color="blue.500" size="80px" thickness="8px" />
+          </Flex> : <SimpleGrid   justifyContent="center"  p={{ base: "8px", sm: "12px" }} spacing={2} minChildWidth={{ base: "8em", sm: "13em", md: "13em", lg: "13em" }} justifyItems="center" >
             {data.map((tag) => (
               <TagComponent key={tag.id} tag={tag} />
             ))}
@@ -339,7 +350,7 @@ export const Taglist = () => {
           // })}
 
         >
-          <Flex direction="row">
+          <Flex direction="row" as="button" onClick={openModal}>
             <Button
               px="2em"
               py="1em"
@@ -353,7 +364,7 @@ export const Taglist = () => {
               justifyContent="center"
               _focusWithin={{ bg: "#3672c2" }}
               _hover={{ bg: "primary" }}
-              onClick={openModal}
+              
             >
               <Icon as={AddIcon} boxSize="2" color="white" />
             </Button>
@@ -371,7 +382,7 @@ export const Taglist = () => {
               alignItems="center"
               justifyContent="center"
               _focusWithin={{ bg: "#3672c2" }}
-              _hover={{ bg: "primary" }} onClick={openModal}
+              _hover={{ bg: "primary" }}
             >
               <Text color="white" fontSize="0.8em" fontWeight="400">
                 Create new tag
