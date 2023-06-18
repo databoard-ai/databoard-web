@@ -2,15 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ChakraBaseProvider } from '@chakra-ui/react'
 import { DataboardTheme } from './style/theme';
-import chakraTheme from '@chakra-ui/theme'
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import LoginScreen from './LoginScreen';
 import ResetPasswordScreen from './ResetpasswordScreen';
 import RegistrationForm from './RegistrationForm';
-import Setup2 from './Setup2';
-import Setup3 from './Setup3';
 import CreateTag from './CreateTag';
 import { Tagdetails } from './Tagdetails';
 import {Taglist} from './Taglist'
@@ -41,16 +38,8 @@ const router = createBrowserRouter([
     element: <CreateTag />,
   },
   {
-    path: "/setup1",
+    path: "/register",
     element: <RegistrationForm />,
-  },
-  {
-    path: "/setup2",
-    element: <Setup2 />,
-  },
-  {
-    path: "/setup3",
-    element: <Setup3 />,
   },
   {
     path: "/reset-password",

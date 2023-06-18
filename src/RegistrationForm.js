@@ -2,13 +2,17 @@
 import { useState, React } from 'react';
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import axios from 'axios';
+import { Box } from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 function RegistrationForm() {
     const [rememberMe, setRememberMe] = useState(false);
+    const toast = useToast()
 
-    function handleRememberMeToggle() {
-        setRememberMe(!rememberMe);
-    }
+    const navigate = useNavigate();
+
+   
 
     const [orgType, setOrgType] = useState("Hotel");
     const [orgTypeIsOpen, setOrgTypeIsOpen] = useState(false);
@@ -49,6 +53,7 @@ function RegistrationForm() {
     const [orgLink, setOrgLink] = useState("");
     const [step, setStep] = useState(1);
 
+    const [isLoading, setIsLoading] = useState(false);
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -70,32 +75,67 @@ function RegistrationForm() {
 
         if (step === 3) {
             // All steps completed, send registration request to API
+            setIsLoading(true)
             try {
-                const response = await axios.post('https://databoard-1-p3241077.deta.app/register', {
-                    org_name: orgName,
-                    org_type: orgType,
-                    org_location: orgLocation,
-                    no_employees: noOfEmployees,
-                    no_branches: noOfBranches,
-                    email: orgEmail,
-                    org_phone: orgPhone,
-                    org_link: orgLink,
-                    org_password: orgPassword,
-                    image: "",
-                    verified: false
+                axios({
+                    method: 'post',
+                    url: 'https://databoard-service.onrender.com/register', data: {
+                        org_name: orgName,
+                        org_type: orgType,
+                        org_location: orgLocation,
+                        no_employees: noOfEmployees,
+                        no_branches: noOfBranches,
+                        email: orgEmail,
+                        org_phone: orgPhone,
+                        org_link: orgLink,
+                        org_password: orgPassword,
+                        image: "",
+                        verified: false
 
+                    }
+                }).then(function (response) {
+                    // Handle response from API
+                    // response=JSON.stringify(response.data)
+
+                    const responseData = response.data;
+                    
+                    const status = responseData.status_code;
+                    if (status === 200) {
+                        const message =  responseData.message;
+                        // Registration successful
+                        toast({
+                            position: 'top-right',
+                            render: () => (
+                              <Box color='white' p={3} bg='green.500' borderRadius="md">
+                                {message}
+                              </Box>
+                            ),
+                          })
+                          navigate('/login');
+                    } else {
+                        const message =  responseData.detail && responseData.detail.message;
+                        toast({
+                            position: 'top-right',
+                            render: () => (
+                              <Box color='white' p={3} bg='red.500' borderRadius="md">
+                               {message}
+                              </Box>
+                            ),
+                          })
+                    }
+                    setIsLoading(false)
                 });
 
-                // Handle response from API
-                if (response.status === 200) {
-                    // Registration successful
-                    console.log('Registration successful!');
-                } else {
-                    // Registration failed
-                    console.error('Registration failed.');
-                }
+
             } catch (error) {
-                console.error('Error during registration:', error);
+                toast({
+                    position: 'top-right',
+                    render: () => (
+                      <Box color='white' p={3} bg='red.500' borderRadius="md">
+                      Something went wrong {error}
+                      </Box>
+                    ),
+                  })
             }
         }
         else {
@@ -173,7 +213,7 @@ function RegistrationForm() {
                         <div className=" p-6   h-full py-40 px-30">
 
                             <h2 className="text-5xl mb-2 font-montserrat text-dark-text">Set up Databoard</h2>
-                            <p className='py-5 font-extralight text-xl  text-dark-text'>Your frst time? Let’s help you set up your databoard</p>
+                            <p className='py-5 font-extralight text-xl  text-dark-text'>Your first time? Let’s help you set up your databoard</p>
                             <form>
                                 <div className="mb-6">
                                     <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="org_type">Type of organization</label>
@@ -242,7 +282,7 @@ function RegistrationForm() {
                                     </div>
                                 </div>
                                 <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={handleSubmit}>
-                                    Continue
+                                    Register
                                 </button>
 
                             </form>
@@ -256,7 +296,7 @@ function RegistrationForm() {
                     <div className=" p-6   h-full py-20 px-30">
 
                         <div className='flex justify-center'>
-                            <div className="relative">
+                            {/* <div className="relative">
                                 <img
                                     className="w-55 h-55 rounded-full cursor-pointer"
                                     src={'https://via.placeholder.com/150'}
@@ -267,12 +307,12 @@ function RegistrationForm() {
                                     type="file"
                                     id="imageUpload"
                                     className="hidden"
-                                // onChange={handleImageUpload}
+                                onChange={handleImageUpload}
                                 />
-                                {/* <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="absolute inset-0 flex items-center justify-center">
                       <BsCamera className="w-8 h-8 text-gray-500" />
-                    </div> */}
-                            </div>
+                    </div>
+                            </div> */}
 
                         </div>
 
@@ -296,7 +336,7 @@ function RegistrationForm() {
                             </div>
 
                             <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-light py-4 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleSubmit} type="button">
-                                Setup databoard
+                            {isLoading? "Loading...":"Register"}
                             </button>
 
                         </form>

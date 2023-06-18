@@ -2,11 +2,7 @@
 import { useState, React } from 'react';
 
 function ResetPasswordScreen() {
-  const [rememberMe, setRememberMe] = useState(false);
 
-  function handleRememberMeToggle() {
-    setRememberMe(!rememberMe);
-  }
   return (
 
     <div className="flex  justify-center h-screen bg-databoard-blue px-50 py-100">

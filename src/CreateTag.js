@@ -1,4 +1,4 @@
-import { BsClock, BsCalendar } from "react-icons/bs";
+// import { BsClock, BsCalendar } from "react-icons/bs";
 import { useState, React } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
 import DatePicker from './DatePicker.js';
@@ -32,22 +32,22 @@ function CreateTag() {
         setEndTime(newTime);
     };
 
-    const [infinitTag, setInfinitTag] = useState(false);
+    const [infiniteTag, setInfiniteTag] = useState(false);
 
-    function handleInfinitTagToggle() {
-        setInfinitTag(!infinitTag);
+    function handleInfiniteTagToggle() {
+        setInfiniteTag(!infiniteTag);
     }
 
     const createTag = async (e) => {
         e.preventDefault();
 
-        if (email.strip() !== '' && tagName.strip() != '' && startDate.strip() != '' && startTime.strip() != '') {
+        if (email.strip() !== '' && tagName.strip() !== '' && startDate.strip() !== '' && startTime.strip() !== '') {
             try {
                 const response = await axios.post('https://databoard-1-p3241077.deta.app/tags/create', {
                     email: email,
                     tag_name: tagName,
                     start_date: startDate,
-                    tag_type: infinitTag ? "infinite" : "finite",
+                    tag_type: infiniteTag ? "infinite" : "finite",
                     start_time: startTime,
                     end_date: endDate,
                     end_time: endTime
@@ -92,8 +92,8 @@ function CreateTag() {
                                         <input
                                             type="checkbox"
                                             className="form-checkbox h-4 w-4 databoard-blue"
-                                            checked={infinitTag}
-                                            onChange={handleInfinitTagToggle}
+                                            checked={infiniteTag}
+                                            onChange={handleInfiniteTagToggle}
                                         />
                                         <span className="ml-2 text-gray-700 font-extralight">infinite tag</span>
                                         <span className='ml-4'>

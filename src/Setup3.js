@@ -1,6 +1,5 @@
 
 import { useState, React } from 'react';
-import { BsCamera } from 'react-icons/bs';
 function Setup3() {
   const [image, setImage] = useState(null);
 

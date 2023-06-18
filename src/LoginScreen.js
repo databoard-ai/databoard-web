@@ -1,6 +1,10 @@
 import { useState, React } from 'react';
 import { Link } from "react-router-dom";
 import axios from 'axios';
+import { Box } from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import qs from 'qs';
 
 function LoginScreen() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -12,30 +16,89 @@ function LoginScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const toast = useToast()
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const config = {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
+  const saveAuthToken = (token) => {
+    localStorage.setItem('authToken', token);
+  };
   const login = async (e) => {
     e.preventDefault();
 
-    if (email.strip() !== '' && password.strip() != '') {
+    if (email.trim() !== '' && password.trim() !== '') {
+      setIsLoading(true)
       try {
-        const response = await axios.post('https://databoard-1-p3241077.deta.app/login', {
-          email,
-          password
+        axios.post(
+             'https://databoard-service.onrender.com/auth/login', 
+           qs.stringify( {
+                username: email,
+                password: password,}
+            ),
+            config
+        ).then(function (response) {
+            // Handle response from API
+            // response=JSON.stringify(response.data)
 
+            const responseData =response.data; 
+            const status = responseData.status_code;
+            if (status === 200) {
+              
+                // console.log("This is the access_token: "+JSON.stringify(responseData.data.access_token))
+                saveAuthToken(responseData.data.access_token)
+                const message =  responseData.message;
+               
+                // login successful
+                toast({
+                    position: 'top-right',
+                    render: () => (
+                      <Box color='white' p={3} bg='green.500' borderRadius="md">
+                        {message}
+                      </Box>
+                    ),
+                  })
+                  setIsLoading(false)
+                  navigate('/taglist');
+            } else {
+                const message =  responseData.detail && responseData.detail.message;
+                toast({
+                    position: 'top-right',
+                    render: () => (
+                      <Box color='white' p={3} bg='red.500' borderRadius="md">
+                       {message}
+                      </Box>
+                    ),
+                  })
+                  setIsLoading(false)
+            }
+           
         });
-        // Handle response from API
-        if (response.status === 200) {
-          // Login successful
-          console.log('Registration successful!');
-        } else {
-          // Login failed
-          console.error('Registration failed.');
-        }
-      } catch (error) {
-        console.error('Error during registration:', error);
-      }
+
+
+    } catch (error) {
+        toast({
+            position: 'top-right',
+            render: () => (
+              <Box color='white' p={3} bg='red.500' borderRadius="md">
+              Something went wrong {error}
+              </Box>
+            ),
+          })
+          setIsLoading(false)
+    }
     } else {
-      console.error('Registration failed.');
+      toast({
+        position: 'top-right',
+        render: () => (
+          <Box color='white' p={3} bg='red.500' borderRadius="md">
+           All fields are required
+          </Box>
+        ),
+      })
     }
   }
 
@@ -79,8 +142,8 @@ function LoginScreen() {
                     Forgot Password?
                   </a>
                 </div>
-                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={login()}>
-                  <Link to='/taglist'>Login</Link>
+                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={login}>
+                 {isLoading?"Loading...":"Login"}
                 </button>
 
               </form>

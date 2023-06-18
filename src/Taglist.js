@@ -1,45 +1,199 @@
-import React, { useState,useEffect } from "react";
-import { Box, Flex, Input, InputGroup, Icon, Button, Text, SimpleGrid,useToast ,  Menu, MenuButton, MenuList, MenuItem,Divider} from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Box, Flex, Input, InputGroup, Icon, Button, Text, SimpleGrid, useToast, Menu, MenuButton, MenuList, MenuItem, Divider,Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
-import { BiQrScan, BiDotsVertical,BiBookOpen } from "react-icons/bi";
+import { BiQrScan, BiDotsVertical, BiBookOpen } from "react-icons/bi";
 import { FaInfinity } from "react-icons/fa";
 import { IoPulseOutline } from "react-icons/io5";
-import { AiOutlineDelete,AiOutlinePrinter,AiOutlineCheckSquare,AiTwotoneEdit } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlinePrinter, AiOutlineCheckSquare, AiTwotoneEdit } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { BsInfoCircle } from 'react-icons/bs';
+import DatePicker from './DatePicker.js';
+import TimePicker from "./TimePicker.js";
+
 
 export const Taglist = () => {
+
+  const getAuthToken = () => {
+    return localStorage.getItem('authToken');
+  };
+
   const [data, setData] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("17:00");
+  const [email, setEmail] = useState("");
+  const [tagName, setTagName] = useState("");
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const handleStartDateChange = (value) => {
+      setStartDate(value);
+  };
+
+  const handleEndDateChange = (value) => {
+      setEndDate(value);
+
+
+  };
+
+  const handleStartTimeChange = (newTime) => {
+      setStartTime(newTime);
+  };
+
+  const handleEndTimeChange = (newTime) => {
+      setEndTime(newTime);
+  };
+
+  const [infiniteTag, setInfiniteTag] = useState(false);
+
+  function handleInfiniteTagToggle() {
+      setInfiniteTag(!infiniteTag);
+  }
+
+  const createTag = async (e) => {
+    e.preventDefault();
+
+    if (email.strip() !== '' && tagName.strip() !== '' && startDate.strip() !== '' && startTime.strip() !== '') {
+        try {
+            const response = await axios.post('https://databoard-1-p3241077.deta.app/tags/create', {
+                email: email,
+                tag_name: tagName,
+                start_date: startDate,
+                tag_type: infiniteTag ? "infinite" : "finite",
+                start_time: startTime,
+                end_date: endDate,
+                end_time: endTime
+
+            });
+            // Handle response from API
+            if (response.status === 200) {
+                // Login successful
+                console.log('Registration successful!');
+            } else {
+                // Login failed
+                console.error('Registration failed.');
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+        }
+    } else {
+        console.error('Registration failed.');
+    }
+}
+
   useEffect(() => {
+    const access_token = getAuthToken()
+    const headers = {
+      'Authorization': `Bearer ${access_token}`
+    };
     const fetchData = async () => {
+      setIsLoading(true)
       try {
-        const response = await axios.get('https://databoard-1-p3241077.deta.app/tags/fetch_all');
-        setData(response.data);
+        const response = await axios.get('https://databoard-service.onrender.com/tags/fetch_all', { headers });
+        setData(response.data.data);
+        setIsLoading(false)
       } catch (error) {
         console.error('Error fetching data:', error);
+        setIsLoading(false)
       }
     };
 
     fetchData();
   }, []);
 
+  const [isOpen, setIsModalOpen] = useState(false);
+  
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
   const toast = useToast()
 
   const TagComponent = ({ tag }) => {
-    const { id, owner_id, type, expiry_date,title } = tag;
+    const { _id, email, tag_name, tag_type, start_date, end_date, start_time, end_time, qr, tag_code } = tag;
     const [isMenuOpen, setMenuOpen] = useState(false);
-  
+
     const handleMenuToggle = () => {
       setMenuOpen(!isMenuOpen);
     };
-  
+
     const handleMenuClose = () => {
       setMenuOpen(false);
     };
-  
+
+
+
+    <Modal isOpen={isOpen} onClose={closeModal} size="lg">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Create an event tag</ModalHeader>
+          <ModalBody>
+          <div className='container mx-auto w-auto md:lg:w-1/2 lg:w-1/4'>
+                    <div className='h-full mx-auto bg-white rounded-sm px-10'>
+                        <div className="    h-full py-24 px-30">
+
+                            <h2 className="text-5xl mb-2 font-montserrat text-dark-text">Create an event tag</h2>
+                            <p className='py-5 font-extralight text-xl  text-dark-text'>Create a tag for your event to help you acess data of your attendees</p>
+                            <form>
+                                <div className="mb-4">
+                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="tag_name">Name</label>
+                                    <input className="appearance-none border h-18 w-full py-4 px-3 text- leading-tight focus:outline-none focus:shadow-outline rounded-md" id="tag_name" type="text" placeholder="Name of tag" value={tagName} onChange={(e) => setTagName(e.target.value)} />
+                                </div>
+                                <div className="flex items-center my-3">
+                                    <label className="inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="form-checkbox h-4 w-4 databoard-blue"
+                                            checked={infiniteTag}
+                                            onChange={handleInfiniteTagToggle}
+                                        />
+                                        <span className="ml-2 text-gray-700 font-extralight">infinite tag</span>
+                                        <span className='ml-4'>
+                                            <BsInfoCircle />
+                                        </span>
+                                    </label>
+
+
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <DatePicker label="Start Date" value={startDate} onChange={handleStartDateChange} />
+                                    <TimePicker label="Start Time" value={startTime} onChange={handleStartTimeChange} />
+
+
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 pb-4">
+
+                                    <DatePicker label="End Date" value={endDate} onChange={handleEndDateChange} />
+                                    <TimePicker label="End Time" value={endTime} onChange={handleEndTimeChange} />
+                                </div>
+
+                                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-light py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={openModal}>
+                                    Create new tag
+                                </button>
+
+                            </form>
+
+
+                        </div>
+                    </div>
+                </div>
+          </ModalBody>
+          <ModalFooter>
+            {/* <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
+              Create new tag
+            </Button> */}
+            <Button onClick={closeModal}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     return (
-      <Link to="/tagdetails">
+
       <Box
         position="relative"
         width={{ base: "10em", sm: "13em", md: "13em", lg: "13em" }}
@@ -49,21 +203,22 @@ export const Taglist = () => {
         borderColor="gray.200"
         p="1em"
         boxShadow="md"
-      >
-        <Flex direction="column" alignItems="center" justifyContent="center">
-          <Icon as={BiQrScan} boxSize={{base:16, sm:28}} color="#4283E4" />
-  
-          {type === "infinite" ? (
-            <Icon as={FaInfinity} boxSize={5} color="#4283E4" my="2" />
-          ) : (
-            <Icon as={IoPulseOutline} boxSize={5} color="#1E1E1E" my="2" />
-          )}
-  
-          <Text color="#121212" fontSize={{base:"12px", sm:"14px"}} textAlign="center">
-            {title}
-          </Text>
-        </Flex>
-  
+      > <Link to="/tagdetails">
+          <Flex direction="column" alignItems="center" justifyContent="center">
+            <Icon as={BiQrScan} boxSize={{ base: 16, sm: 28 }} color="#4283E4" />
+
+            {tag_type === "infinite" ? (
+              <Icon as={FaInfinity} boxSize={5} color="#4283E4" my="2" />
+            ) : (
+              <Icon as={IoPulseOutline} boxSize={5} color="#1E1E1E" my="2" />
+            )}
+
+            <Text color="#121212" fontSize={{ base: "12px", sm: "14px" }} textAlign="center">
+              {tag_name}
+            </Text>
+          </Flex>
+        </Link>
+
         <Menu isOpen={isMenuOpen} onClose={handleMenuClose}>
           <MenuButton
             as={Box}
@@ -87,7 +242,7 @@ export const Taglist = () => {
             _focus={{ outline: "none" }}
             zIndex={5}
           >
-           <MenuItem _hover={{ bg: "gray.100" }} icon={<BiBookOpen />} px="2" my="1" fontSize="1.0em" fontWeight="bold">
+            <MenuItem _hover={{ bg: "gray.100" }} icon={<BiBookOpen />} px="2" my="1" fontSize="1.0em" fontWeight="bold">
               Open tag
             </MenuItem>
             <Divider />
@@ -104,66 +259,46 @@ export const Taglist = () => {
             <MenuItem _hover={{ bg: "gray.100" }} icon={<IoPulseOutline />} px="2" my="1">
               Tag analysis
             </MenuItem>
-            <MenuItem _hover={{ bg: "gray.100" }} icon={<AiOutlineDelete  />} px="2" my="1">
+            <MenuItem _hover={{ bg: "gray.100" }} icon={<AiOutlineDelete />} px="2" my="1">
               Delete
             </MenuItem>
           </MenuList>
         </Menu>
       </Box>
-      </Link>
+
     );
   };
 
-  const tags = [
-    { id: 1, owner_id: "123", type: "finite", expiry_date: "2023-12-31", title: "Agrotech Seminar" },
-    { id: 2, owner_id: "456", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-    { id: 3, owner_id: "789", type: "finite", expiry_date: "2023-09-15", title: "Agrotech Seminar" },
-    { id: 4, owner_id: "101", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-    { id: 5, owner_id: "112", type: "finite", expiry_date: "2024-05-31", title: "Agrotech Seminar" },
-    { id: 6, owner_id: "131", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-    { id: 7, owner_id: "415", type: "finite", expiry_date: "2023-11-30", title: "Agrotech Seminar" },
-    { id: 8, owner_id: "161", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-    { id: 9, owner_id: "718", type: "finite", expiry_date: "2024-02-28", title: "Agrotech Seminar" },
-    { id: 10, owner_id: "919", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-    { id: 11, owner_id: "789", type: "finite", expiry_date: "2023-09-15", title: "Agrotech Seminar" },
-    { id: 12, owner_id: "101", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-    { id: 13, owner_id: "112", type: "finite", expiry_date: "2024-05-31", title: "Agrotech Seminar" },
-    { id: 14, owner_id: "131", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-    { id: 15, owner_id: "415", type: "finite", expiry_date: "2023-11-30", title: "Agrotech Seminar" },
-    { id: 16, owner_id: "161", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-    { id: 17, owner_id: "718", type: "finite", expiry_date: "2024-02-28", title: "Agrotech Seminar" },
-    { id: 18, owner_id: "919", type: "infinite", expiry_date: "N/A", title: "Agrotech Seminar" },
-  ];
   return (
     <Flex width="full" direction="column">
       <Box position="sticky" top="0" zIndex={6000}>
         <Flex width="full" px="20px" py="20px" bg="#4283E4" alignItems="flex-end">
-        <Flex verticalAlign="center" my={{ base: "10px", sm: "0px" }}>
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        bg="red.500"
-        borderRadius="full"
-        width={{ base: "30px", sm: "50px", md: "60px" }}
-        height={{ base: "30px", sm: "50px", md: "60px" }}
-      >
-        <Text fontSize={{ base: "10px", sm: "16px", md: "20px" }} color="white">
-          AL
-        </Text>
-      </Box>
-      <Box ml="10px" mt={{base:"0.5em", sm:"0.7em"}}>
-        <Flex
-          alignItems="center"
-          justifyContent="center"
-          flexDirection="column"
-        >
-          <Text fontSize={{ base: "8px", sm: "20px", md: "20px" }} color="white">
-            Abc Light room
-          </Text>
-        </Flex>
-      </Box>
-    </Flex>
+          <Flex verticalAlign="center" my={{ base: "10px", sm: "0px" }}>
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              bg="red.500"
+              borderRadius="full"
+              width={{ base: "30px", sm: "50px", md: "60px" }}
+              height={{ base: "30px", sm: "50px", md: "60px" }}
+            >
+              <Text fontSize={{ base: "10px", sm: "16px", md: "20px" }} color="white">
+                AL
+              </Text>
+            </Box>
+            <Box ml="10px" mt={{ base: "0.5em", sm: "0.7em" }}>
+              <Flex
+                alignItems="center"
+                justifyContent="center"
+                flexDirection="column"
+              >
+                <Text fontSize={{ base: "8px", sm: "20px", md: "20px" }} color="white">
+                  Abc Light room
+                </Text>
+              </Flex>
+            </Box>
+          </Flex>
           <InputGroup ml="auto" width="250px">
             <Input
               type="text"
@@ -172,7 +307,7 @@ export const Taglist = () => {
               bg="white"
               px="5"
               _focus={{ outline: "1px solid primary", boxShadow: "none" }}
-              width={{base:"60vw",sm:"full"}}
+              width={{ base: "60vw", sm: "full" }}
               height="40px"
               textAlign="left"
             />
@@ -180,69 +315,71 @@ export const Taglist = () => {
         </Flex>
       </Box>
       <Box height="90vh" bg="#FEFEFE" display="flex" alignItems="" justifyContent="flex-start" p="1em" flexDirection="column">
-        <SimpleGrid p={{ base: "8px", sm: "12px" }} spacing={10} minChildWidth={{ base: "8em", sm: "13em", md: "13em", lg: "13em" }}>
-          {tags.map((tag) => (
-            <TagComponent key={tag.id} tag={tag}  />
-          ))}
-        </SimpleGrid>
+        {isLoading ?
+          <Text>Loading....</Text> : <SimpleGrid   justifyContent="center"  p={{ base: "8px", sm: "12px" }} spacing={2} minChildWidth={{ base: "8em", sm: "13em", md: "13em", lg: "13em" }} justifyItems="center" >
+            {data.map((tag) => (
+              <TagComponent key={tag.id} tag={tag} />
+            ))}
+          </SimpleGrid>
+        }
       </Box>
-      <Link to='/create-tag'>
-      <Button
-        position="fixed"
-        bottom="8"
-        right="4"
-        mx="10"
-        width="200px"
-        as="button"
-        onClick={()=>toast({
-          title: 'Account created.',
-          description: "We've created your account for you.",
-          status: 'success',
-          duration: 9000,
-          isClosable: true,
-        })}
-       
-      >
-        <Flex direction="row">
-          <Button
-            px="2em"
-            py="1em"
-            bg="#4283E4"
-            borderTopLeftRadius="0.5em"
-            borderBottomLeftRadius="0.5em"
-            borderTopRightRadius="none"
-            borderBottomRightRadius="none"
-            flex="1"
-            alignItems="center"
-            justifyContent="center"
-            _focusWithin={{bg: "#3672c2"}}
-            _hover={{ bg: "primary" }}
-          >
-            <Icon as={AddIcon} boxSize="2" color="white" />
-          </Button>
-          <Box bg="#ffff" w="0.12em"></Box>
-          <Button
-            borderTopRightRadius="0.5em"
-            borderBottomRightRadius="0.5em"
-            borderTopLeftRadius="none"
-            borderBottomLeftRadius="none"
-            bg="#4283E4"
-            px="1em"
-            py="1em"
-            flex="14"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            _focusWithin={{bg: "#3672c2"}}
-            _hover={{ bg: "primary" }}
-          >
-            <Text color="white" fontSize="0.8em" fontWeight="400">
-              Create new tag
-            </Text>
-          </Button>
-        </Flex>
-      </Button>
-      </Link>
+        <Button
+          position="fixed"
+          bottom="8"
+          right="4"
+          mx="10"
+          width="200px"
+          as="button"
+          // onClick={() => toast({
+          //   title: 'Account created.',
+          //   description: "We've created your account for you.",
+          //   status: 'success',
+          //   duration: 9000,
+          //   isClosable: true,
+          // })}
+
+        >
+          <Flex direction="row">
+            <Button
+              px="2em"
+              py="1em"
+              bg="#4283E4"
+              borderTopLeftRadius="0.5em"
+              borderBottomLeftRadius="0.5em"
+              borderTopRightRadius="none"
+              borderBottomRightRadius="none"
+              flex="1"
+              alignItems="center"
+              justifyContent="center"
+              _focusWithin={{ bg: "#3672c2" }}
+              _hover={{ bg: "primary" }}
+              onClick={openModal}
+            >
+              <Icon as={AddIcon} boxSize="2" color="white" />
+            </Button>
+            <Box bg="#ffff" w="0.12em"></Box>
+            <Button
+              borderTopRightRadius="0.5em"
+              borderBottomRightRadius="0.5em"
+              borderTopLeftRadius="none"
+              borderBottomLeftRadius="none"
+              bg="#4283E4"
+              px="1em"
+              py="1em"
+              flex="14"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              _focusWithin={{ bg: "#3672c2" }}
+              _hover={{ bg: "primary" }} onClick={openModal}
+            >
+              <Text color="white" fontSize="0.8em" fontWeight="400">
+                Create new tag
+              </Text>
+            </Button>
+          </Flex>
+        </Button>
+      
 
     </Flex>
   );
