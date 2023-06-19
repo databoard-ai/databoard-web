@@ -24,8 +24,10 @@ function LoginScreen() {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   };
-  const saveAuthToken = (token) => {
+  const saveCredentials = (token,email,org_name) => {
     localStorage.setItem('authToken', token);
+    localStorage.setItem('email', email);
+    localStorage.setItem('org_name', org_name);
   };
   const login = async (e) => {
     e.preventDefault();
@@ -49,7 +51,7 @@ function LoginScreen() {
             if (status === 200) {
               
                 // console.log("This is the access_token: "+JSON.stringify(responseData.data.access_token))
-                saveAuthToken(responseData.data.access_token)
+                saveCredentials(responseData.data.access_token,responseData.data.user.email,responseData.data.user.org_name)
                 const message =  responseData.message;
                
                 // login successful
@@ -143,7 +145,13 @@ function LoginScreen() {
                   </a>
                 </div>
                 <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={login}>
-                 {isLoading?"Loading...":"Login"}
+                {isLoading ? (
+        <div className="flex justify-center items-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+        </div>
+      ) : (
+        'Login'
+      )}
                 </button>
 
               </form>

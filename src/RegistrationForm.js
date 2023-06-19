@@ -2,8 +2,7 @@
 import { useState, React } from 'react';
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import axios from 'axios';
-import { Box } from '@chakra-ui/react';
-import { useToast } from '@chakra-ui/react';
+import { Box,useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
 function RegistrationForm() {
@@ -12,7 +11,7 @@ function RegistrationForm() {
 
     const navigate = useNavigate();
 
-   
+
 
     const [orgType, setOrgType] = useState("Hotel");
     const [orgTypeIsOpen, setOrgTypeIsOpen] = useState(false);
@@ -98,30 +97,30 @@ function RegistrationForm() {
                     // response=JSON.stringify(response.data)
 
                     const responseData = response.data;
-                    
+
                     const status = responseData.status_code;
                     if (status === 200) {
-                        const message =  responseData.message;
+                        const message = responseData.message;
                         // Registration successful
                         toast({
                             position: 'top-right',
                             render: () => (
-                              <Box color='white' p={3} bg='green.500' borderRadius="md">
-                                {message}
-                              </Box>
+                                <Box color='white' p={3} bg='green.500' borderRadius="md">
+                                    {message}
+                                </Box>
                             ),
-                          })
-                          navigate('/login');
+                        })
+                        navigate('/login');
                     } else {
-                        const message =  responseData.detail && responseData.detail.message;
+                        const message = responseData.detail && responseData.detail.message;
                         toast({
                             position: 'top-right',
                             render: () => (
-                              <Box color='white' p={3} bg='red.500' borderRadius="md">
-                               {message}
-                              </Box>
+                                <Box color='white' p={3} bg='red.500' borderRadius="md">
+                                    {message}
+                                </Box>
                             ),
-                          })
+                        })
                     }
                     setIsLoading(false)
                 });
@@ -131,11 +130,11 @@ function RegistrationForm() {
                 toast({
                     position: 'top-right',
                     render: () => (
-                      <Box color='white' p={3} bg='red.500' borderRadius="md">
-                      Something went wrong {error}
-                      </Box>
+                        <Box color='white' p={3} bg='red.500' borderRadius="md">
+                            Something went wrong {error}
+                        </Box>
                     ),
-                  })
+                })
             }
         }
         else {
@@ -336,7 +335,13 @@ function RegistrationForm() {
                             </div>
 
                             <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-light py-4 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleSubmit} type="button">
-                            {isLoading? "Loading...":"Register"}
+                                {isLoading ? (
+                                    <div className="flex justify-center items-center">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                                    </div>
+                                ) : (
+                                    'Register'
+                                )}
                             </button>
 
                         </form>
