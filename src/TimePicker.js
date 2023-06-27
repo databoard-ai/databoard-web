@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { ClockIcon } from '@heroicons/react/solid';
 
 function TimePicker({ label, value, onChange, disabled=false }) {
     const [time, setTime] = useState(value);

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Box, Flex, Input, InputGroup, Icon, Button, Text, SimpleGrid, useToast, Menu, MenuButton, MenuList, MenuItem, Divider, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, CircularProgress } from "@chakra-ui/react";
+import React, { useState, useEffect,useCallback } from "react";
+import { Box, Flex, Input, InputGroup, Icon, Button, Text,  useToast, Menu, MenuButton, MenuList, MenuItem, Divider, Modal, ModalOverlay, ModalContent, ModalBody, CircularProgress } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { BiQrScan, BiDotsVertical, BiBookOpen, BiFolderPlus } from "react-icons/bi";
 import { FaInfinity } from "react-icons/fa";
 import { IoPulseOutline } from "react-icons/io5";
-import { AiOutlineDelete, AiOutlinePrinter, AiOutlineCheckSquare, AiTwotoneEdit, AiFillFolderAdd } from "react-icons/ai";
-import { Link,useNavigate } from "react-router-dom";
+import { AiOutlineDelete, AiOutlinePrinter, AiOutlineCheckSquare, AiTwotoneEdit } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { BsFolder2Open, BsInfoCircle } from 'react-icons/bs';
+import {  BsInfoCircle } from 'react-icons/bs';
 import DatePicker from './DatePicker.js';
 import TimePicker from "./TimePicker.js";
-import { useDisclosure } from "@chakra-ui/react";
 
 
 export const Taglist = () => {
@@ -20,16 +19,7 @@ export const Taglist = () => {
   };
 
   const [data, setData] = useState([]);
-  const calculateSpacing = () => {
-    const totalTags = data.length;
-    if (totalTags < 3) {
-      return 2;
-    } else if (totalTags < 6) {
-      return 4;
-    } else {
-      return 8;
-    }
-  };
+ 
   const navigate = useNavigate();
 
   const [isLoadingTags, setIsLoadingTags] = useState(false);
@@ -42,10 +32,8 @@ export const Taglist = () => {
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
   const access_token = getAuthToken()
-  const headers = {
-    'Authorization': `Bearer ${access_token}`
-  };
 
+  const toast = useToast()
   const handleStartDateChange = (value) => {
     setStartDate(value);
   };
@@ -148,28 +136,28 @@ export const Taglist = () => {
       });
     }
   }
-  const fetchData = async () => {
-   
-      
-    setIsLoadingTags(true)
+  const fetchData = useCallback(async () => {
+    const access_token = getAuthToken()
+  const headers = {
+    'Authorization': `Bearer ${access_token}`
+  };
+    setIsLoadingTags(true);
     try {
       const response = await axios.get('https://databoard-service.onrender.com/tags/fetch_all', { headers });
-      if(response.data.status_code===401){
+      if (response.data.status_code === 401) {
         toast({
           position: 'top-center',
           render: () => (
             <Box color='white' p={3} bg='red.500' borderRadius="md">
-             Your session is ended. Please sign in again.
+              Your session is ended. Please sign in again.
             </Box>
           ),
-         
-        })
-        setIsLoadingTags(false)
+        });
+        setIsLoadingTags(false);
         navigate('/login');
-
       }
-       response.data.data?setData(response.data.data):setData([]);
-      setIsLoadingTags(false)
+      response.data.data ? setData(response.data.data) : setData([]);
+      setIsLoadingTags(false);
     } catch (error) {
       toast({
         position: 'top-center',
@@ -178,13 +166,13 @@ export const Taglist = () => {
             Something went wrong: {error}
           </Box>
         ),
-      })
-      setIsLoadingTags(false)
+      });
+      setIsLoadingTags(false);
     }
-  };
+  }, [toast,navigate]);
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -196,11 +184,10 @@ export const Taglist = () => {
     setIsModalOpen(false);
   };
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const toast = useToast()
+
 
   const TagComponent = ({ tag }) => {
-    const { _id, email, tag_name, tag_type, start_date, end_date, start_time, end_time, qr, tag_code } = tag;
+
     const [isMenuOpen, setMenuOpen] = useState(false);
 
     const handleMenuToggle = () => {
@@ -211,7 +198,9 @@ export const Taglist = () => {
       setMenuOpen(false);
     };
 
-
+    const viewTag = (tag_code) => {
+      navigate(`/tagdetails/${tag_code}`);
+    };
 
 
     return (
@@ -225,21 +214,21 @@ export const Taglist = () => {
         borderColor="gray.200"
         p="1em"
         boxShadow="md"
-      > <Link to="/tagdetails">
-          <Flex direction="column" alignItems="center" justifyContent="center">
+      > 
+          <Flex direction="column" alignItems="center" justifyContent="center" onClick={() =>viewTag(tag.tag_code)}>
             <Icon as={BiQrScan} boxSize={{ base: 16, sm: 28 }} color="#4283E4" />
 
-            {tag_type === "infinite" ? (
+            {tag.tag_type === "infinite" ? (
               <Icon as={FaInfinity} boxSize={5} color="#4283E4" my="2" />
             ) : (
               <Icon as={IoPulseOutline} boxSize={5} color="#1E1E1E" my="2" />
             )}
 
             <Text color="#121212" fontSize={{ base: "12px", sm: "14px" }} textAlign="center">
-              {tag_name}
+              {tag.tag_name}
             </Text>
           </Flex>
-        </Link>
+       
 
         <Menu isOpen={isMenuOpen} onClose={handleMenuClose}>
           <MenuButton
@@ -491,8 +480,6 @@ Create a new tag and lets begin</Text>
           </Flex>
         </Button>
       }
-
-
     </Flex>
   );
 };

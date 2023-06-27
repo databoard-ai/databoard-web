@@ -19,12 +19,7 @@ function LoginScreen() {
   const toast = useToast()
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const config = {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  };
-  const saveCredentials = (token,email,org_name) => {
+  const saveCredentials = (token, email, org_name) => {
     localStorage.setItem('authToken', token);
     localStorage.setItem('email', email);
     localStorage.setItem('org_name', org_name);
@@ -36,68 +31,73 @@ function LoginScreen() {
       setIsLoading(true)
       try {
         axios.post(
-             'https://databoard-service.onrender.com/auth/login', 
-           qs.stringify( {
-                username: email,
-                password: password,}
-            ),
-            config
-        ).then(function (response) {
-            // Handle response from API
-            // response=JSON.stringify(response.data)
-
-            const responseData =response.data; 
-            const status = responseData.status_code;
-            if (status === 200) {
-              
-                // console.log("This is the access_token: "+JSON.stringify(responseData.data.access_token))
-                saveCredentials(responseData.data.access_token,responseData.data.user.email,responseData.data.user.org_name)
-                const message =  responseData.message;
-               
-                // login successful
-                toast({
-                    position: 'top-right',
-                    render: () => (
-                      <Box color='white' p={3} bg='green.500' borderRadius="md">
-                        {message}
-                      </Box>
-                    ),
-                  })
-                  setIsLoading(false)
-                  navigate('/taglist');
-            } else {
-                const message =  responseData.detail && responseData.detail.message;
-                toast({
-                    position: 'top-right',
-                    render: () => (
-                      <Box color='white' p={3} bg='red.500' borderRadius="md">
-                       {message}
-                      </Box>
-                    ),
-                  })
-                  setIsLoading(false)
+          'https://databoard-service.onrender.com/auth/login',
+          qs.stringify({
+            username: email,
+            password: password,
+          }
+          ),
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
             }
-           
+          }
+        ).then(function (response) {
+          // Handle response from API
+          // response=JSON.stringify(response.data)
+
+          const responseData = response.data;
+          const status = responseData.status_code;
+          if (status === 200) {
+
+            // console.log("This is the access_token: "+JSON.stringify(responseData.data.access_token))
+            saveCredentials(responseData.data.access_token, responseData.data.user.email, responseData.data.user.org_name)
+            const message = responseData.message;
+
+            // login successful
+            toast({
+              position: 'top-right',
+              render: () => (
+                <Box color='white' p={3} bg='green.500' borderRadius="md">
+                  {message}
+                </Box>
+              ),
+            })
+            setIsLoading(false)
+            navigate('/taglist');
+          } else {
+            const message = responseData.detail && responseData.detail.message;
+            toast({
+              position: 'top-right',
+              render: () => (
+                <Box color='white' p={3} bg='red.500' borderRadius="md">
+                  {message}
+                </Box>
+              ),
+            })
+            setIsLoading(false)
+          }
+
         });
 
 
-    } catch (error) {
+      } catch (error) {
         toast({
-            position: 'top-right',
-            render: () => (
-              <Box color='white' p={3} bg='red.500' borderRadius="md">
+          position: 'top-right',
+          render: () => (
+            <Box color='white' p={3} bg='red.500' borderRadius="md">
               Something went wrong {error}
-              </Box>
-            ),
-          })
-          setIsLoading(false)
-    }
+            </Box>
+          ),
+        })
+        setIsLoading(false)
+      }
     } else {
       toast({
         position: 'top-right',
         render: () => (
           <Box color='white' p={3} bg='red.500' borderRadius="md">
-           All fields are required
+            All fields are required
           </Box>
         ),
       })
@@ -145,26 +145,19 @@ function LoginScreen() {
                   </a>
                 </div>
                 <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={login}>
-                {isLoading ? (
-        <div className="flex justify-center items-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-        </div>
-      ) : (
-        'Login'
-      )}
+                  {isLoading ? (
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                    </div>
+                  ) : (
+                    'Login'
+                  )}
                 </button>
-
               </form>
-
-
             </div>
           </div>
         </div>
       </div>
-
-
-
-
     </div>
   );
 }

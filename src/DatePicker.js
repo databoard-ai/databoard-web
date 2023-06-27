@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { CalendarIcon } from '@heroicons/react/solid';
 
 function DatePicker({ label, value, onChange, disabled=false }) {
     const [isFocused, setIsFocused] = useState(false);
