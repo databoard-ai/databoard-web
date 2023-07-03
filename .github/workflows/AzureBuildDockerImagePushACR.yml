@@ -1,6 +1,9 @@
 name: Build Linux Container Image and Push to ACR
 
 on:
+  push:
+    branches: [ "dev" ]
+
   workflow_dispatch:
 
 jobs:
