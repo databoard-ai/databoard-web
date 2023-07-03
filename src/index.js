@@ -9,55 +9,75 @@ import LoginScreen from './LoginScreen';
 import ResetPasswordScreen from './ResetpasswordScreen';
 import RegistrationForm from './RegistrationForm';
 import CreateTag from './CreateTag';
-import { Tagdetails } from './Tagdetails';
+import { Clocks } from './Tagdetails';
 import {Taglist} from './Taglist'
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 
+import ErrorBoundary from './ErrorBoundary';
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element:(
+      <ErrorBoundary>
+         <App />
+      </ErrorBoundary>
+    ),
   },
   {
     path: "/login",
-    element: <LoginScreen />,
+    element:(
+      <ErrorBoundary>
+         <LoginScreen />
+      </ErrorBoundary>
+    ),
   },
   {
     path: "/taglist",
-    element: <Taglist />,
+    element: (
+      <ErrorBoundary>
+        <Taglist />
+      </ErrorBoundary>
+    ),
   },
   {
-    path: "/tagdetails",
-    element: <Tagdetails />,
+    path: "/tagdetails/:tag_id",
+    element: (
+      <ErrorBoundary>
+        <Clocks />
+      </ErrorBoundary>
+    ),
   },
   {
     path: "/create-tag",
-    element: <CreateTag />,
+    element: (
+      <ErrorBoundary>
+        <CreateTag />
+      </ErrorBoundary>
+    ),
   },
   {
     path: "/register",
-    element: <RegistrationForm />,
+    element: (<ErrorBoundary>
+      <RegistrationForm />
+    </ErrorBoundary>),
   },
   {
     path: "/reset-password",
-    element: <ResetPasswordScreen />,
+    element: (<ErrorBoundary>
+      <ResetPasswordScreen />
+    </ErrorBoundary>),
   },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  // <React.StrictMode>
-  //   <App />
-  // </React.StrictMode>
   <ChakraBaseProvider theme={DataboardTheme}>
   <RouterProvider router={router}/>
   </ChakraBaseProvider>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

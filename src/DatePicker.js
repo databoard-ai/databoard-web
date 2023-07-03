@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { CalendarIcon } from '@heroicons/react/solid';
 
-function DatePicker({ label, value, onChange }) {
+function DatePicker({ label, value, onChange, disabled=false }) {
     const [isFocused, setIsFocused] = useState(false);
 
     const handleDateChange = (e) => {
@@ -20,15 +19,13 @@ function DatePicker({ label, value, onChange }) {
           name={label}
           value={value}
           onChange={handleDateChange}
+          disabled={disabled}
           className={`${
             isFocused ? 'focus:ring-indigo-500 focus:border-indigo-500' : ''
-          } block w-full pr-10 border border-gray-300 rounded-md py-4 px-2`}
+          } block w-full pr-2 border border-gray-300 rounded-md py-4 px-2`}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-          <CalendarIcon className="w-4 h-4 text-gray-400" />
-        </div>
       </div>
     </div>
   );

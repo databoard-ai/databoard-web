@@ -2,8 +2,7 @@
 import { useState, React } from 'react';
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import axios from 'axios';
-import { Box } from '@chakra-ui/react';
-import { useToast } from '@chakra-ui/react';
+import { Box, useToast, Select } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
 function RegistrationForm() {
@@ -12,7 +11,7 @@ function RegistrationForm() {
 
     const navigate = useNavigate();
 
-   
+
 
     const [orgType, setOrgType] = useState("Hotel");
     const [orgTypeIsOpen, setOrgTypeIsOpen] = useState(false);
@@ -26,6 +25,9 @@ function RegistrationForm() {
     ];
     const [orgName, setOrgName] = useState("");
     const [orgLocation, setOrgLocation] = useState("");
+    const handleOrgLocationChange = (event) => {
+        setOrgLocation(event.target.value);
+      };
     const [noOfBranches, setSelectedNoOfBranches] = useState("1");
     const [isBranchesOpen, setIsBranchesOpen] = useState(false);
     const branchesOptions = [
@@ -98,30 +100,30 @@ function RegistrationForm() {
                     // response=JSON.stringify(response.data)
 
                     const responseData = response.data;
-                    
+
                     const status = responseData.status_code;
                     if (status === 200) {
-                        const message =  responseData.message;
+                        const message = responseData.message;
                         // Registration successful
                         toast({
                             position: 'top-right',
                             render: () => (
-                              <Box color='white' p={3} bg='green.500' borderRadius="md">
-                                {message}
-                              </Box>
+                                <Box color='white' p={3} bg='green.500' borderRadius="md">
+                                    {message}
+                                </Box>
                             ),
-                          })
-                          navigate('/login');
+                        })
+                        navigate('/login');
                     } else {
-                        const message =  responseData.detail && responseData.detail.message;
+                        const message = responseData.detail && responseData.detail.message;
                         toast({
                             position: 'top-right',
                             render: () => (
-                              <Box color='white' p={3} bg='red.500' borderRadius="md">
-                               {message}
-                              </Box>
+                                <Box color='white' p={3} bg='red.500' borderRadius="md">
+                                    {message}
+                                </Box>
                             ),
-                          })
+                        })
                     }
                     setIsLoading(false)
                 });
@@ -131,11 +133,11 @@ function RegistrationForm() {
                 toast({
                     position: 'top-right',
                     render: () => (
-                      <Box color='white' p={3} bg='red.500' borderRadius="md">
-                      Something went wrong {error}
-                      </Box>
+                        <Box color='white' p={3} bg='red.500' borderRadius="md">
+                            Something went wrong {error}
+                        </Box>
                     ),
-                  })
+                })
             }
         }
         else {
@@ -158,43 +160,30 @@ function RegistrationForm() {
                                     <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="org_name">Name of organization</label>
                                     <input className="appearance-none border h-18 w-full py-4 px-3 text- leading-tight focus:outline-none focus:shadow-outline rounded-md" id="org_name" type="text" placeholder="Name of organization" value={orgName} onChange={(e) => setOrgName(e.target.value)} />
                                 </div>
+                               
                                 <div className="mb-6">
-                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="org_type">Type of organization</label>
-                                    <div className="relative inline-block text-left w-full ">
-                                        <div className='w-full'>
-                                            <button
-                                                type="button"
-                                                className="relative w-full rounded-md shadow-sm pl-3 pr-10 py-4 text-left cursor-pointer bg-white text-gray-800 font-medium border border-gray-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                                onClick={() => setOrgTypeIsOpen(!orgTypeIsOpen)}
-                                            >
-                                                <span className="block truncate">{orgType}</span>
-                                                <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                                    <ChevronDownIcon className="h-5 w-5 text-gray-400" />
-                                                </span>
-                                            </button>
-                                            {orgTypeIsOpen && (
-                                                <div className="absolute mt-1 w-64 rounded-md bg-white shadow-lg">
-                                                    {orgTypes.map((option) => (
-                                                        <button
-                                                            key={option}
-                                                            onClick={() => {
-                                                                setOrgType(option);
-                                                                setOrgTypeIsOpen(false);
-                                                            }}
-                                                            className="block w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                        >
-                                                            {option}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="location">Type of organization</label>
+                                    <Select placeholder='Select option' size='lg' value={orgType} onChange={(e) => setOrgType(e.target.value)}>
+                                        <option value='Lagos'>ICT</option>
+                                        <option value='Abuja'>Military</option>
+                                        <option value='Port-Harcourt'>Government</option>
+                                        <option value='Jos'>Digital</option>
+                                        <option value='Enugu'>Fabricator</option>
+                                        <option value='Benue'>Hotel</option>
+                                    </Select>
                                 </div>
                                 <div className="mb-6">
                                     <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="location">Location</label>
-                                    <input className="appearance-none border rounded w-full py-4 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="location" type="text" placeholder="Location" value={orgLocation} onChange={(e) => setOrgLocation(e.target.value)} />
+                                    <Select placeholder='Select option' size='lg' value={orgLocation} onChange={(e) => setOrgLocation(e.target.value)}>
+                                        <option value='Lagos'>Lagos</option>
+                                        <option value='Abuja'>Abuja</option>
+                                        <option value='Port-Harcourt'>Port-Harcourt</option>
+                                        <option value='Jos'>Jos</option>
+                                        <option value='Enugu'>Enugu</option>
+                                        <option value='Benue'>Benue</option>
+                                    </Select>
                                 </div>
+
 
 
                                 <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={handleSubmit}>
@@ -216,7 +205,7 @@ function RegistrationForm() {
                             <p className='py-5 font-extralight text-xl  text-dark-text'>Your first time? Let’s help you set up your databoard</p>
                             <form>
                                 <div className="mb-6">
-                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="org_type">Type of organization</label>
+                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="org_type">Number of Employees</label>
                                     <div className="relative inline-block text-left w-full ">
                                         <div className='w-full'>
                                             <button
@@ -249,7 +238,7 @@ function RegistrationForm() {
                                     </div>
                                 </div>
                                 <div className="mb-6">
-                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="org_type">Type of organization</label>
+                                    <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="org_type">Number of Branches</label>
                                     <div className="relative inline-block text-left w-full ">
                                         <div className='w-full'>
                                             <button
@@ -282,7 +271,7 @@ function RegistrationForm() {
                                     </div>
                                 </div>
                                 <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={handleSubmit}>
-                                    Register
+                                    Continue
                                 </button>
 
                             </form>
@@ -315,8 +304,7 @@ function RegistrationForm() {
                             </div> */}
 
                         </div>
-
-                        <p className='py-5 font-extralight text-md  text-dark-text text-center'>Upload an image of your brand’s Identity</p>
+                        <p className='py-5 font-extralight text-4xl  text-dark-text text-center'>Tell us a little more about your Organization</p>
                         <form>
                             <div className="mb-4">
                                 <label className="block text-dark-text font-light mb-2 font-montserrat" htmlFor="email">Organization Email</label>
@@ -336,7 +324,13 @@ function RegistrationForm() {
                             </div>
 
                             <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-light py-4 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleSubmit} type="button">
-                            {isLoading? "Loading...":"Register"}
+                                {isLoading ? (
+                                    <div className="flex justify-center items-center">
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                                    </div>
+                                ) : (
+                                    'Register'
+                                )}
                             </button>
 
                         </form>

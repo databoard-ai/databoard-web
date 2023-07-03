@@ -43,7 +43,7 @@ function CreateTag() {
 
         if (email.strip() !== '' && tagName.strip() !== '' && startDate.strip() !== '' && startTime.strip() !== '') {
             try {
-                const response = await axios.post('https://databoard-1-p3241077.deta.app/tags/create', {
+                const response = await axios.post('https://databoard-service.onrender.com/tags/create', {
                     email: email,
                     tag_name: tagName,
                     start_date: startDate,

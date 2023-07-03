@@ -9,37 +9,101 @@ import {
     MenuItem,
     FormControl,
     FormLabel,
+    CircularProgress,
     NumberInputStepper,
     NumberIncrementStepper,
     NumberDecrementStepper,
+    useToast
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, CloseIcon } from "@chakra-ui/icons";
+import { BiFolderPlus, BiNoEntry } from "react-icons/bi";
 import { IoSend, IoStarOutline } from "react-icons/io5";
 import { BsFillStarFill, BsPerson, BsPeople, BsCalendar, BsSend } from "react-icons/bs";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from "axios";
+
+
 
 const MAX_PAGES_TO_SHOW = 1;
-export const Tagdetails = () => {
+export const Clocks = () => {
+    const [isLoadingclocks, setIsLoadingclocks] = useState(false);
+    const getAuthToken = () => {
+        return localStorage.getItem('authToken');
+    };
+    const access_token = getAuthToken()
+    const headers = {
+        'Authorization': `Bearer ${access_token}`
+    };
+    const toast = useToast()
+    const { tag_id } = useParams();
+    const [clocks, setclocks] = useState([]);
+    const navigate = useNavigate();
 
-    const [gender, setGender] = useState('');
+
+    const fetchData = useCallback(async () => {
+        const headers = {
+            'Authorization': `Bearer ${access_token}`
+        };
+        setIsLoadingclocks(true);
+        try {
+            const response = await axios.get(`https://databoard-service.onrender.com/clocks/fetch_tag_clocks/${tag_id}`, { headers });
+            if (response.data.status_code === 401) {
+                toast({
+                    position: 'top-center',
+                    render: () => (
+                        <Box color='white' p={3} bg='red.500' borderRadius="md">
+                            Your session is ended. Please sign in again.
+                        </Box>
+                    ),
+                });
+                setIsLoadingclocks(false);
+                navigate('/login');
+            }
+            response.data.data ? setclocks(response.data.data) : setclocks([]);
+            setIsLoadingclocks(false);
+        } catch (error) {
+            toast({
+                position: 'top-center',
+                render: () => (
+                    <Box color='white' p={3} bg='red.500' borderRadius="md">
+                        Something went wrong: {error}
+                    </Box>
+                ),
+            });
+            setIsLoadingclocks(false);
+        }
+    }, [tag_id, navigate, toast]);
+
+
+
+    useEffect(() => {
+
+        fetchData();
+    }, [fetchData]);
+
+
+
+
+    const [genderFilter, setGenderFilter] = useState('');
     const [showGenderFilterDropdown, setShowGenderFilterDropdown] = useState(false);
 
     const handleGenderChange = (value) => {
-        setGender(value);
+        setGenderFilter(value);
         setShowGenderFilterDropdown(false);
     };
 
     const clearGenderFilter = () => {
-        setGender('');
+        setGenderFilter('');
     };
     const GenderFilter = () => {
 
 
         return (
             <Flex alignItems="center">
-                {gender ? (
+                {genderFilter ? (
                     <FilterChip
-                        label={`Gender: ${gender}`}
+                        label={`Gender: ${genderFilter}`}
                         onDelete={clearGenderFilter}
                         onDropdownToggle={() => setShowGenderFilterDropdown(!showGenderFilterDropdown)}
                     />
@@ -54,9 +118,10 @@ export const Tagdetails = () => {
                             px={3}
                             py={1}
                             rightIcon={<ChevronDownIcon />}
+                            fontWeight="normal"
 
                         >
-                            {gender ? '' : 'Gender'
+                            {genderFilter ? '' : 'Gender'
                             }
                         </MenuButton>
                         <MenuList>
@@ -68,28 +133,28 @@ export const Tagdetails = () => {
             </Flex>
         );
     };
-    const [fromAge, setFromAge] = useState(1);
-    const [toAge, setToAge] = useState("");
+    const [fromAgeFilter, setFromAgeFilter] = useState(1);
+    const [toAgeFilter, setToAgeFilter] = useState("");
     const [filterAge, setFilterAge] = useState(false);
     const [isAgeFilterMenuOpen, setIsAgeFilterMenuOpen] = useState(false);
 
     const handleFromAgeChange = (value) => {
-        setFromAge(value);
+        setFromAgeFilter(value);
     };
 
     const handleToAgeChange = (value) => {
-        setToAge(value);
+        setToAgeFilter(value);
     };
 
     const applyAgeFilter = () => {
         setFilterAge(true);
-        console.log(`Filtering age from ${fromAge} to ${toAge}`);
+        console.log(`Filtering age from ${fromAgeFilter} to ${toAgeFilter}`);
         closeAgeFilterMenu();
     };
 
     const clearAgeFilter = () => {
-        setFromAge("");
-        setToAge("");
+        setFromAgeFilter("");
+        setToAgeFilter("");
         setFilterAge(false);
         closeAgeFilterMenu();
     };
@@ -106,9 +171,9 @@ export const Tagdetails = () => {
 
         return (
             <Flex alignItems="center">
-                {(fromAge && toAge && filterAge) ? (
+                {(fromAgeFilter && toAgeFilter && filterAge) ? (
                     <FilterChip
-                        label={`Age: ${fromAge || ""} - ${toAge || ""}`}
+                        label={`Age: ${fromAgeFilter || ""} - ${toAgeFilter || ""}`}
                         onDelete={clearAgeFilter}
                     />
                 ) : (
@@ -123,6 +188,7 @@ export const Tagdetails = () => {
                                 px={3}
                                 py={1}
                                 onClick={openAgeFilterMenu}
+                                fontWeight="light"
                             >
                                 Age
                                 <ChevronDownIcon ml={2} />
@@ -135,7 +201,7 @@ export const Tagdetails = () => {
                                     <NumberInput
                                         id="from-age"
                                         min={1}
-                                        value={fromAge}
+                                        value={fromAgeFilter}
                                         onChange={handleFromAgeChange}
                                         size="sm"
                                     >
@@ -152,8 +218,8 @@ export const Tagdetails = () => {
                                     </FormLabel>
                                     <NumberInput
                                         id="to-age"
-                                        min={fromAge}
-                                        value={toAge}
+                                        min={fromAgeFilter}
+                                        value={toAgeFilter}
                                         onChange={handleToAgeChange}
                                         size="sm"
                                     >
@@ -188,52 +254,52 @@ export const Tagdetails = () => {
         );
     };
 
-    const [fromTime, setFromTime] = useState(1);
-    const [toTime, setToTime] = useState("");
-    const [filterTime, setFilterTime] = useState(false);
-    const [isTimeFilterMenuOpen, setIsTimeFilterMenuOpen] = useState(false);
+    const [fromDateFilter, setFromDateFilter] = useState("");
+    const [toDateFilter, setToDateFilter] = useState("");
+    const [filterDate, setFilterDate] = useState(false);
+    const [isDateFilterMenuOpen, setIsDateFilterMenuOpen] = useState(false);
 
-    const handleFromTimeChange = (value) => {
-        setFromTime(value);
+    const handleFromDateChange = (event) => {
+        setFromDateFilter(event.target.value);
     };
 
-    const handleToTimeChange = (value) => {
-        setToTime(value);
+    const handleToDateChange = (event) => {
+        setToDateFilter(event.target.value);
     };
 
-    const applyTimeFilter = () => {
-        setFilterTime(true);
-        console.log(`Filtering time from ${fromTime} to ${toTime}`);
-        closeTimeFilterMenu();
+    const applyDateFilter = () => {
+        setFilterDate(true);
+        console.log(`Filtering time from ${fromDateFilter} to ${toDateFilter}`);
+        closeDateFilterMenu();
     };
 
-    const clearTimeFilter = () => {
-        setFromTime("");
-        setToTime("");
-        setFilterTime(false);
-        closeTimeFilterMenu();
+    const clearDateFilter = () => {
+        setFromDateFilter("");
+        setToDateFilter("");
+        setFilterDate(false);
+        closeDateFilterMenu();
     };
 
-    const openTimeFilterMenu = () => {
-        setIsTimeFilterMenuOpen(true);
+    const openDateFilterMenu = () => {
+        setIsDateFilterMenuOpen(true);
     };
 
-    const closeTimeFilterMenu = () => {
-        setIsTimeFilterMenuOpen(false);
+    const closeDateFilterMenu = () => {
+        setIsDateFilterMenuOpen(false);
     };
-    const TimeFilter = () => {
+    const DateFilter = () => {
 
 
         return (
             <Flex alignItems="center">
-                {(fromTime && toTime && filterTime) ? (
+                {(fromDateFilter && toDateFilter && filterDate) ? (
                     <FilterChip
-                        label={`Time: ${fromTime || ""} - ${toTime || ""}`}
-                        onDelete={clearTimeFilter}
+                        label={`Time: ${fromDateFilter || ""} - ${toDateFilter || ""}`}
+                        onDelete={clearDateFilter}
                     />
                 ) : (
                     <div>
-                        <Menu isOpen={isTimeFilterMenuOpen} onClose={closeTimeFilterMenu}>
+                        <Menu isOpen={isDateFilterMenuOpen} onClose={closeDateFilterMenu}>
                             <MenuButton
                                 as={Button}
                                 variant="outline"
@@ -242,9 +308,10 @@ export const Tagdetails = () => {
                                 borderColor="gray.300"
                                 px={3}
                                 py={1}
-                                onClick={openTimeFilterMenu}
+                                onClick={openDateFilterMenu}
+                                fontWeight="normal"
                             >
-                                Time
+                                Date
                                 <ChevronDownIcon ml={2} />
                             </MenuButton>
                             <MenuList minWidth="auto" p="5">
@@ -252,51 +319,27 @@ export const Tagdetails = () => {
                                     <FormLabel htmlFor="from-time" fontSize="sm">
                                         From
                                     </FormLabel>
-                                    <NumberInput
-                                        id="from-time"
-                                        min={1}
-                                        value={fromTime}
-                                        onChange={handleFromTimeChange}
-                                        size="sm"
-                                    >
-                                        <NumberInputField placeholder="From" />
-                                        <NumberInputStepper>
-                                            <NumberIncrementStepper />
-                                            <NumberDecrementStepper />
-                                        </NumberInputStepper>
-                                    </NumberInput>
+                                    <input id="from-date" type="date" value={fromDateFilter} onChange={handleFromDateChange}></input>
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel htmlFor="to-time" fontSize="sm">
+                                    <FormLabel ht   mlFor="to-time" fontSize="sm">
                                         To
                                     </FormLabel>
-                                    <NumberInput
-                                        id="to-time"
-                                        min={fromTime}
-                                        value={toTime}
-                                        onChange={handleToTimeChange}
-                                        size="sm"
-                                    >
-                                        <NumberInputField placeholder="To" />
-                                        <NumberInputStepper>
-                                            <NumberIncrementStepper />
-                                            <NumberDecrementStepper />
-                                        </NumberInputStepper>
-                                    </NumberInput>
+                                    <input id="to-date" type="date" value={toDateFilter} onChange={handleToDateChange}></input>
                                 </FormControl>
                                 <Flex my={3}>
                                     <Button
                                         bg="primary"
                                         color="white"
                                         size="sm"
-                                        onClick={applyTimeFilter}
+                                        onClick={applyDateFilter}
                                         _hover={{ color: "white", bg: "primary", border: "1px solid white" }}
                                         value={true}
                                         mr={2}
                                     >
                                         Done
                                     </Button>
-                                    <Button size="sm" onClick={clearTimeFilter}>
+                                    <Button size="sm" onClick={clearDateFilter}>
                                         Clear
                                     </Button>
                                 </Flex>
@@ -308,28 +351,28 @@ export const Tagdetails = () => {
         );
     };
 
-    const [fromRating, setFromRating] = useState(1);
-    const [toRating, setToRating] = useState("");
+    const [fromRatingFilter, setFromRatingFilter] = useState(1);
+    const [toRatingFilter, setToRatingFilter] = useState("");
     const [filterRating, setFilterRating] = useState(false);
     const [isRatingFilterMenuOpen, setIsRatingFilterMenuOpen] = useState(false);
 
     const handleFromRatingChange = (value) => {
-        setFromRating(value);
+        setFromRatingFilter(value);
     };
 
     const handleToRatingChange = (value) => {
-        setToRating(value);
+        setToRatingFilter(value);
     };
 
     const applyRatingFilter = () => {
         setFilterRating(true);
-        console.log(`Filtering rating from ${fromRating} to ${toRating}`);
+        console.log(`Filtering rating from ${fromRatingFilter} to ${toRatingFilter}`);
         closeRatingFilterMenu();
     };
 
     const clearRatingFilter = () => {
-        setFromRating("");
-        setToRating("");
+        setFromRatingFilter("");
+        setToRatingFilter("");
         setFilterRating(false);
         closeRatingFilterMenu();
     };
@@ -347,9 +390,9 @@ export const Tagdetails = () => {
 
         return (
             <Flex alignItems="center">
-                {(fromRating && toRating && filterRating) ? (
+                {(fromRatingFilter && toRatingFilter && filterRating) ? (
                     <FilterChip
-                        label={`Rating: ${fromRating || ""} - ${toRating || ""}`}
+                        label={`Rating: ${fromRatingFilter || ""} - ${toRatingFilter || ""}`}
                         onDelete={clearRatingFilter}
                     />
                 ) : (
@@ -364,6 +407,7 @@ export const Tagdetails = () => {
                                 px={3}
                                 py={1}
                                 onClick={openRatingFilterMenu}
+                                fontWeight="normal"
                             >
                                 Rating
                                 <ChevronDownIcon ml={2} />
@@ -376,7 +420,7 @@ export const Tagdetails = () => {
                                     <NumberInput
                                         id="from-rating"
                                         min={1}
-                                        value={fromRating}
+                                        value={fromRatingFilter}
                                         onChange={handleFromRatingChange}
                                         size="sm"
                                     >
@@ -393,8 +437,8 @@ export const Tagdetails = () => {
                                     </FormLabel>
                                     <NumberInput
                                         id="to-rating"
-                                        min={fromRating}
-                                        value={toRating}
+                                        min={fromRatingFilter}
+                                        value={toRatingFilter}
                                         onChange={handleToRatingChange}
                                         size="sm"
                                     >
@@ -429,6 +473,37 @@ export const Tagdetails = () => {
         );
     };
 
+    const filterData = () => {
+        let filteredData = [...clocks];
+        // Filter by date
+        if (fromDateFilter !== '' && toDateFilter !=='') {
+          filteredData = filteredData.filter(item => {
+            return item.date >= fromDateFilter && item.date <= toDateFilter;
+          });
+        }
+        if (fromAgeFilter !== '' && toAgeFilter !=='') {
+            filteredData = filteredData.filter(item => {
+              return item.age >= fromAgeFilter && item.age <= toAgeFilter;
+            });
+          }
+
+          if (fromRatingFilter !== '' && toRatingFilter !=='') {
+            filteredData = filteredData.filter(item => {
+              return item.rating >= fromRatingFilter && item.rating <= toRatingFilter;
+            });
+          }
+    
+        // Filter by gender
+        if (genderFilter !== '') {
+          filteredData = filteredData.filter(item => item.gender.toLowerCase() === genderFilter);
+        }
+    
+        return filteredData;
+      };
+    const filteredData = filterData();
+
+
+  
     const [fileFormat, setFileFormat] = useState("");
     const [showDownloadDropdown, setShowDownloadDropdown] = useState(false);
 
@@ -476,55 +551,16 @@ export const Tagdetails = () => {
     const [pageSize, setPageSize] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const clocks = [
-        { id: 1, name: "Tunde Aregbesola", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 2, name: "Grace Bimbo", gender: "Female", time: "10:20.40", age: 12 },
-        { id: 3, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 4, name: "Taye Gbenga", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 5, name: "Kehinde Gbenga", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 6, name: "Pamilerin Aje", gender: "Female", time: "10:20.40", age: 12 },
-        { id: 7, name: "James Lukumon", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 8, name: "Isaac Philip", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 9, name: "Niniola Stephen", gender: "Female", time: "10:20.40", age: 12 },
-        { id: 10, name: "Hanna Grace", gender: "Male", time: "10:20.40 ", age: 12 },
-        { id: 11, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 12, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 13, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 14, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 15, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 16, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 17, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 18, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 19, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 20, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 21, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 22, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 23, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 24, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 25, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 26, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 27, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 28, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 29, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 30, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 31, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 32, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 33, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 34, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 35, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 36, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 37, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-        { id: 38, name: "Hanna Grace", gender: "Male", time: "10:20.40", age: 12 },
-    ];
+
     // Calculate the total number of pages
-    const totalPages = Math.ceil(clocks.length / pageSize);
+    const totalPages = Math.ceil(filteredData.length / pageSize);
 
     // Calculate the index of the first and last item on the current page
     const indexOfLastItem = currentPage * pageSize;
     const indexOfFirstItem = indexOfLastItem - pageSize;
 
     // Get the items for the current page
-    const currentItems = clocks.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
     // Function to handle page change
     const handlePageSizeChange = (event) => {
@@ -555,7 +591,7 @@ export const Tagdetails = () => {
     const clearAllFilters = () => {
         clearAgeFilter();
         clearGenderFilter();
-        clearTimeFilter();
+        clearDateFilter();
         clearRatingFilter();
     };
 
@@ -604,7 +640,7 @@ export const Tagdetails = () => {
             setSelectedRows([]);
             setSelectAll(false);
         } else {
-            const allRowIds = clocks.map((clock) => clock.id);
+            const allRowIds = filteredData.map((clock) => clock.id);
             setSelectedRows(allRowIds);
             setSelectAll(true);
         }
@@ -664,8 +700,8 @@ export const Tagdetails = () => {
             <Flex width="full" height="10vh" flexDirection="row" bg="#F4F4F4" top={{ base: "6vh", sm: "6vh", md: "8vh", lg: "8vh", xl: "8vh" }} alignItems="center" justifyItems="center" overflow="hidden">
                 <Box display="flex" flexDirection="row" justifyContent="space-between" px="5em" width="full">
                     <HStack justify="flex-start">
-                        <GenderFilter /><AgeFilter /><TimeFilter /><RatingFilter />
-                        {(toAge && fromAge) || (fromRating && toRating) || (fromTime && toTime) || gender ? (
+                        <GenderFilter /><AgeFilter /><DateFilter /><RatingFilter />
+                        {(toAgeFilter && fromAgeFilter) || (fromRatingFilter && toRatingFilter) || (fromDateFilter && toDateFilter) || genderFilter ? (
                             <ClearFilterChip />
                         ) : null}
                     </HStack>
@@ -743,137 +779,170 @@ export const Tagdetails = () => {
                         </ModalFooter>
                     </ModalContent>
                 </Modal>
+                {isLoadingclocks ? (
+                    <Flex width="full" height="full" alignItems="center" justifyContent="center">
+                        <CircularProgress isIndeterminate color="blue.500" size="80px" thickness="5px" />
+                    </Flex>
+                ) : filteredData.length === 0 ? (
+                    <Flex width="full" height="full" alignItems="center" justifyContent="center" direction="column" pt="30vh">
+                        <Icon as={BiNoEntry} boxSize="40" color="gray.600" />
+                        <Text alignContent="center" color="#121212" fontSize="16px">Oops!</Text>
+                        <Text alignContent="center" color="#121212" fontSize="16px">
+                            No clocks yet for this tag</Text>
+                    </Flex>
+                ) :
 
-                <TableContainer>
-                    <Table variant="simple" border="0.5 solid #C3C3C3" color="dark">
-                        <Thead mt="30vh"
-                            top={0}
-                            bg="white"
-                            zIndex={1}
-                            width="100%"
-                            boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)">
-                            <Tr>
-                                <Td>
-                                    <Checkbox isChecked={selectAll} onChange={handleSelectAll} />
-                                </Td>
-                                <Th fontSize="16px">Name</Th>
-                                <Th fontSize="16px">Gender</Th>
-                                <Th fontSize="16px">Rating</Th>
-                                <Th isNumeric fontSize="16px">
-                                    Time In
-                                </Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody fontWeight="light">
-                            {currentItems.map((clock) => (
-                                <Tr key={clock.id}>
-                                    <Td>
-                                        <Checkbox
-                                            isChecked={selectedRows.includes(clock.id)}
-                                            onChange={() => handleRowSelection(clock.id)}
-                                        />
+                    <TableContainer>
+                        <Table variant="simple" border="0.5 solid #C3C3C3" color="dark">
+                            <Thead mt="30vh"
+                                top={0}
+                                bg="white"
+                                zIndex={1}
+                                width="100%"
+                                boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)">
+                                <Tr>
+                                    <Td sx={{ paddingRight: { base: "50px", sm: "100px", md: "200px" } }}>
+                                        <Checkbox isChecked={selectAll} onChange={handleSelectAll} />
                                     </Td>
-                                    <Td>{clock.name}</Td>
-                                    <Td>{clock.gender}</Td>
-                                    <Td>
-                                        <HStack>
-                                            <Icon as={BsFillStarFill} color="primary" />
-                                            <Icon as={BsFillStarFill} color="primary" />
-                                            <Icon as={BsFillStarFill} color="primary" />
-                                            <Icon as={BsFillStarFill} color="primary" />
-                                            <Icon as={IoStarOutline} />
-                                        </HStack>
-                                    </Td>
-                                    <Td isNumeric>{clock.time}</Td>
+                                    <Th fontSize="16px" sx={{ paddingRight: { base: "50px", sm: "100px", md: "200px" } }}>Name</Th>
+                                    <Th fontSize="16px" sx={{ paddingRight: { base: "50px", sm: "100px", md: "200px" } }}>Gender</Th>
+                                    <Th fontSize="16px" sx={{ paddingRight: { base: "50px", sm: "100px", md: "200px" } }}>Rating</Th>
+                                    <Th isNumeric fontSize="16px" sx={{ paddingRight: { base: "50px", sm: "100px", md: "200px" } }}>
+                                        Date
+                                    </Th>
+                                    <Th isNumeric fontSize="16px" sx={{ paddingRight: { base: "50px", sm: "100px", md: "200px" } }}>
+                                        Time In
+                                    </Th>
                                 </Tr>
-                            ))}
-                        </Tbody>
-                        <Tfoot>
-                            <Tr>
-                                <Td colSpan={5}>
-                                    <Flex justifyContent="space-between" alignItems="center">
-                                        <Box>
+                            </Thead>
+                            <Tbody fontWeight="light">
+                                {currentItems.map((clock) => (
+                                    <Tr key={clock.user_id}>
+                                        <Td>
+                                            <Checkbox
+                                                isChecked={selectedRows.includes(clock.id)}
+                                                onChange={() => handleRowSelection(clock.id)}
+                                            />
+                                        </Td>
+                                        <Td>  
+                                            
+                                        <HStack>
+                                            <Box
+                                            display="flex"
+                                            justifyContent="center"
+                                            alignItems="center"
+                                            bg="red.500"
+                                            borderRadius="full"
+                                            width={{ base: "30px", sm: "30px", md: "30px" }}
+                                            height={{ base: "30px", sm: "30px", md: "30px" }}
+                                        >
+                                            <Text fontSize={{ base: "10px", sm: "10px", md: "10px" }} color="white">
+                                                {clock.fname.charAt(0).toUpperCase()+""+clock.lname.charAt(0).toUpperCase()}
+                                            </Text>
+                                        </Box> <Text color="black">{clock.fname +" "+ clock.lname}</Text></HStack></Td>
+                                        <Td>{clock.gender}</Td>
+                                        <Td>
+                                            <HStack>
+                                                <Icon as={BsFillStarFill} color="primary" />
+                                                <Icon as={BsFillStarFill} color="primary" />
+                                                <Icon as={BsFillStarFill} color="primary" />
+                                                <Icon as={BsFillStarFill} color="primary" />
+                                                <Icon as={IoStarOutline} />
+                                            </HStack>
+                                        </Td>
+                                        <Td><Text color="black">{clock.date}</Text></Td>
+                                        <Td><Text color="black">{clock.time}</Text></Td>
+                                    </Tr>
+                                ))}
+                            </Tbody>
+                            <Tfoot>
+                                <Tr>
+                                    <Td colSpan={6}>
+                                        <Flex justifyContent="space-between" alignItems="center">
                                             <Box>
-                                                <Text as="span" fontSize="sm">
-                                                    Rows per page:
-                                                </Text>
-                                                <Select
-                                                    size="sm"
-                                                    value={pageSize}
-                                                    onChange={handlePageSizeChange}
-                                                    borderRadius="md"
-                                                >
-                                                    <option value={5}>5</option>
-                                                    <option value={10}>10</option>
-                                                    <option value={40}>40</option>
-                                                </Select>
-                                            </Box>
-                                        </Box>
-                                        <Box>
-                                            <Flex justifyContent="center" alignItems="center">
-                                                {
-                                                    currentPage === 1 ?
-                                                        <Flex></Flex> :
-                                                        <Button
-                                                            size="lg"
-                                                            disabled={currentPage === 1}
-                                                            variant="link"
-                                                            onClick={() => handlePageChange(currentPage - 1)}
-                                                            rightIcon={<ChevronLeftIcon />}
-                                                        >
-                                                        </Button>
-                                                }
-                                                {currentPage > MAX_PAGES_TO_SHOW + 2 && (
-                                                    <>
-                                                        <Button size="sm" key={1} colorScheme={currentPage === 1 ? "blue" : "gray"}
-                                                            variant="link"
-                                                            onClick={() => handlePageChange(1)}>
-                                                            1
-                                                        </Button>
-                                                        <Text mx={1}>...</Text>
-                                                    </>
-                                                )}
-                                                {getPageRange().map((page) => (
-                                                    <Button
-                                                        key={page}
+                                                <Box>
+                                                    <Text as="span" fontSize="sm">
+                                                        Rows per page:
+                                                    </Text>
+                                                    <Select
                                                         size="sm"
-                                                        variant="link"
-                                                        colorScheme={currentPage === page ? "blue" : "gray"}
-                                                        onClick={() => handlePageChange(page)}
+                                                        value={pageSize}
+                                                        onChange={handlePageSizeChange}
+                                                        borderRadius="md"
                                                     >
-                                                        {page}
-                                                    </Button>
-                                                ))}
-                                                {currentPage < totalPages - MAX_PAGES_TO_SHOW - 1 && (
-                                                    <>
-                                                        <Text mx={1}>...</Text>
-                                                        <Button size="sm" variant="link" colorScheme={currentPage === totalPages ? "blue" : "gray"}
-                                                            onClick={() => handlePageChange(totalPages)}>
-                                                            {totalPages}
-                                                        </Button>
-                                                    </>
-                                                )}
-                                                {
-                                                    currentPage === totalPages ? <Flex></Flex> :
+                                                        <option value={5}>5</option>
+                                                        <option value={10}>10</option>
+                                                        <option value={40}>40</option>
+                                                    </Select>
+                                                </Box>
+                                            </Box>
+                                            <Box>
+                                                <Flex justifyContent="center" alignItems="center">
+                                                    {
+                                                        currentPage === 1 ?
+                                                            <Flex></Flex> :
+                                                            <Button
+                                                                size="lg"
+                                                                disabled={currentPage === 1}
+                                                                variant="link"
+                                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                                rightIcon={<ChevronLeftIcon />}
+                                                            >
+                                                            </Button>
+                                                    }
+                                                    {currentPage > MAX_PAGES_TO_SHOW + 2 && (
+                                                        <>
+                                                            <Button size="sm" key={1} colorScheme={currentPage === 1 ? "blue" : "gray"}
+                                                                variant="link"
+                                                                onClick={() => handlePageChange(1)}>
+                                                                1
+                                                            </Button>
+                                                            <Text mx={1}>...</Text>
+                                                        </>
+                                                    )}
+                                                    {getPageRange().map((page) => (
                                                         <Button
-                                                            size="lg"
+                                                            key={page}
+                                                            size="sm"
                                                             variant="link"
-                                                            color="primary"
-                                                            disabled={currentPage === totalPages}
-                                                            onClick={() => handlePageChange(currentPage + 1)}
-                                                            rightIcon={<ChevronRightIcon color="primary" />}
+                                                            colorScheme={currentPage === page ? "blue" : "gray"}
+                                                            onClick={() => handlePageChange(page)}
                                                         >
-
+                                                            {page}
                                                         </Button>
-                                                }
-                                            </Flex>
-                                        </Box>
-                                    </Flex>
-                                </Td>
-                            </Tr>
-                        </Tfoot>
-                    </Table>
-                </TableContainer>
+                                                    ))}
+                                                    {currentPage < totalPages - MAX_PAGES_TO_SHOW - 1 && (
+                                                        <>
+                                                            <Text mx={1}>...</Text>
+                                                            <Button size="sm" variant="link" colorScheme={currentPage === totalPages ? "blue" : "gray"}
+                                                                onClick={() => handlePageChange(totalPages)}>
+                                                                {totalPages}
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                    {
+                                                        currentPage === totalPages ? <Flex></Flex> :
+                                                            <Button
+                                                                size="lg"
+                                                                variant="link"
+                                                                color="primary"
+                                                                disabled={currentPage === totalPages}
+                                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                                rightIcon={<ChevronRightIcon color="primary" />}
+                                                            >
+
+                                                            </Button>
+                                                    }
+                                                </Flex>
+                                            </Box>
+                                        </Flex>
+                                    </Td>
+                                </Tr>
+                            </Tfoot>
+                        </Table>
+                    </TableContainer>
+
+                }
             </Box>
         </Box>
     );
@@ -890,6 +959,7 @@ const FilterChip = ({ label, onDelete, onDropdownToggle }) => {
                 borderColor="gray.300"
                 px={3}
                 py={1}
+                fontWeight="light"
             >
                 {label}
             </Button>
