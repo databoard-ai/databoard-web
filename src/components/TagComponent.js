@@ -5,7 +5,7 @@ import { FaInfinity } from "react-icons/fa";
 import { IoPulseOutline } from "react-icons/io5";
 import { AiOutlineDelete,AiOutlinePrinter,AiOutlineCheckSquare,AiTwotoneEdit } from "react-icons/ai";
 
-export const TagComponent = ({ tag }) => {
+export default TagComponent = ({ tag }) => {
   const { id, owner_id, type, expiry_date,title } = tag;
   const [isMenuOpen, setMenuOpen] = useState(false);
 

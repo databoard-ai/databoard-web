@@ -1,8 +1,8 @@
 // import { BsClock, BsCalendar } from "react-icons/bs";
 import { useState, React } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
-import DatePicker from './DatePicker.js';
-import TimePicker from "./TimePicker.js";
+import DatePicker from '../components/DatePicker.js';
+import TimePicker from "../components/TimePicker.js";
 import axios from "axios";
 
 function CreateTag() {

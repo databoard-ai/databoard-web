@@ -1,7 +1,7 @@
-import logo from './logo.svg';
 
-import './App.css';
-import LoginScreen from './LoginScreen';
+
+import './style/App.css';
+import LoginScreen from './auth/LoginScreen';
 function App() {
   return (
   

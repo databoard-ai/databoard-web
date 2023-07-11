@@ -2,15 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ChakraBaseProvider } from '@chakra-ui/react'
 import { DataboardTheme } from './style/theme';
-import './index.css';
+import './style/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import LoginScreen from './LoginScreen';
-import ResetPasswordScreen from './ResetpasswordScreen';
-import RegistrationForm from './RegistrationForm';
-import CreateTag from './CreateTag';
-import { Clocks } from './Tagdetails';
-import {Taglist} from './Taglist'
+import LoginScreen from './auth/LoginScreen';
+import ResetPasswordScreen from './auth/ResetpasswordScreen';
+import RegistrationForm from './auth/RegistrationForm';
+import CreateTag from './home/CreateTag';
+import { Clocks } from './home/Tagdetails';
+import {Taglist} from './home/Taglist'
 import {
   createBrowserRouter,
   RouterProvider,

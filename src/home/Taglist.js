@@ -8,8 +8,8 @@ import { AiOutlineDelete, AiOutlinePrinter, AiOutlineCheckSquare, AiTwotoneEdit 
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {  BsInfoCircle } from 'react-icons/bs';
-import DatePicker from './DatePicker.js';
-import TimePicker from "./TimePicker.js";
+import DatePicker from '../components/DatePicker.js';
+import TimePicker from "../components/TimePicker.js";
 
 
 export const Taglist = () => {

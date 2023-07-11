@@ -2,7 +2,7 @@ import { useState, React } from 'react';
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import { Box } from '@chakra-ui/react';
-import { useToast,HStack,Text } from '@chakra-ui/react';
+import { useToast, HStack, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import qs from 'qs';
 
@@ -145,14 +145,14 @@ function LoginScreen() {
                   </a>
                 </div>
                 <div className="flex items-start my-5">
-                <a
+                  <a
                     className="inline-block align-baseline font-extralight text-sm text-blue-500 hover:text-blue-800 ml-auto"
-                    href="#" onClick={()=>navigate('/register')}
+                    href="#" onClick={() => navigate('/register')}
                   >
-                   <HStack><Text color="black">Don't have an account?</Text> <Text fontWeight="bold">Register</Text></HStack>
+                    <HStack><Text color="black">Don't have an account?</Text> <Text fontWeight="bold">Register</Text></HStack>
                   </a>
 
-                 
+
                 </div>
                 <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={login}>
                   {isLoading ? (

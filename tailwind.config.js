@@ -10,9 +10,9 @@ module.exports = {
     extend: {
       backgroundImage: {
         
-        'signin': "url('/src/bg_signin.png')",
-        'reset_password':"url('/src/bg_reset_pass.png')",
-        'setup':"url('/src/setup.png')"
+        'signin': "url('/src/assets/img/bg_signin.png')",
+        'reset_password':"url('/src/assets/img/bg_reset_pass.png')",
+        'setup':"url('/src/assets/img/setup.png')"
       },
       colors: {
         'databoard-blue': '#4283E4',
