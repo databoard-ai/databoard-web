@@ -1,5 +1,5 @@
-import React, { useState, useEffect,useCallback } from "react";
-import { Box, Flex, Input, InputGroup, Icon, Button, Text,  useToast, Menu, MenuButton, MenuList, MenuItem, Divider, Modal, ModalOverlay, ModalContent, ModalBody, CircularProgress } from "@chakra-ui/react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, Flex, Input, InputGroup, Icon, Button, Text, useToast, Menu, MenuButton, MenuList, MenuItem, Divider, Modal, ModalOverlay, ModalContent, ModalBody, CircularProgress } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { BiQrScan, BiDotsVertical, BiBookOpen, BiFolderPlus } from "react-icons/bi";
 import { FaInfinity } from "react-icons/fa";
@@ -7,9 +7,12 @@ import { IoPulseOutline } from "react-icons/io5";
 import { AiOutlineDelete, AiOutlinePrinter, AiOutlineCheckSquare, AiTwotoneEdit } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {  BsInfoCircle } from 'react-icons/bs';
+import { BsInfoCircle } from 'react-icons/bs';
 import DatePicker from '../components/DatePicker.js';
 import TimePicker from "../components/TimePicker.js";
+import { useDispatch, useSelector } from 'react-redux';
+import fetchTags from '../redux/reducers/tagsSlice';
+
 
 
 export const Taglist = () => {
@@ -19,10 +22,9 @@ export const Taglist = () => {
   };
 
   const [data, setData] = useState([]);
- 
+
   const navigate = useNavigate();
 
-  const [isLoadingTags, setIsLoadingTags] = useState(false);
   const [isLoadingTagCreation, setIsLoadingTagCreation] = useState(false);
   const org_name = localStorage.getItem('org_name')
   const [startTime, setStartTime] = useState("09:00");
@@ -83,7 +85,7 @@ export const Taglist = () => {
           end_date: endDate,
           end_time: endTime
 
-        },{ headers });
+        }, { headers });
 
         // Handle response from API
         if (response.status === 200) {
@@ -137,28 +139,27 @@ export const Taglist = () => {
     }
   }
   const fetchData = useCallback(async () => {
-    const access_token = getAuthToken()
-  const headers = {
-    'Authorization': `Bearer ${access_token}`
-  };
-    setIsLoadingTags(true);
     try {
-      const response = await axios.get('https://databoard-service.onrender.com/tags/fetch_all', { headers });
-      if (response.data.status_code === 401) {
-        toast({
-          position: 'top-center',
-          render: () => (
-            <Box color='white' p={3} bg='red.500' borderRadius="md">
-              Your session is ended. Please sign in again.
-            </Box>
-          ),
-        });
-        setIsLoadingTags(false);
-        navigate('/login');
-      }
-      response.data.data ? setData(response.data.data) : setData([]);
-      setIsLoadingTags(false);
-    } catch (error) {
+      dispatch(loginUser(credentials)).then((response)=>{
+        const statusCode = response.meta.status;
+        const responseData = response.payload.data;
+
+        if (statusCode===401){
+          toast({
+            position: 'top-center',
+            render: () => (
+              <Box color='white' p={3} bg='red.500' borderRadius="md">
+                Your session is ended. Please sign in again.
+              </Box>
+            ),
+          });
+          navigate('/login');
+        }
+     
+      responseData.data ? setData(responseData.data) : setData([]);
+     
+    }); 
+  }catch (error) {
       toast({
         position: 'top-center',
         render: () => (
@@ -167,9 +168,8 @@ export const Taglist = () => {
           </Box>
         ),
       });
-      setIsLoadingTags(false);
     }
-  }, [toast,navigate]);
+  }, [toast, navigate]);
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -214,21 +214,21 @@ export const Taglist = () => {
         borderColor="gray.200"
         p="1em"
         boxShadow="md"
-      > 
-          <Flex direction="column" alignItems="center" justifyContent="center" onClick={() =>viewTag(tag.tag_code)}>
-            <Icon as={BiQrScan} boxSize={{ base: 16, sm: 28 }} color="#4283E4" />
+      >
+        <Flex direction="column" alignItems="center" justifyContent="center" onClick={() => viewTag(tag.tag_code)}>
+          <Icon as={BiQrScan} boxSize={{ base: 16, sm: 28 }} color="#4283E4" />
 
-            {tag.tag_type === "infinite" ? (
-              <Icon as={FaInfinity} boxSize={5} color="#4283E4" my="2" />
-            ) : (
-              <Icon as={IoPulseOutline} boxSize={5} color="#1E1E1E" my="2" />
-            )}
+          {tag.tag_type === "infinite" ? (
+            <Icon as={FaInfinity} boxSize={5} color="#4283E4" my="2" />
+          ) : (
+            <Icon as={IoPulseOutline} boxSize={5} color="#1E1E1E" my="2" />
+          )}
 
-            <Text color="#121212" fontSize={{ base: "12px", sm: "14px" }} textAlign="center">
-              {tag.tag_name}
-            </Text>
-          </Flex>
-       
+          <Text color="#121212" fontSize={{ base: "12px", sm: "14px" }} textAlign="center">
+            {tag.tag_name}
+          </Text>
+        </Flex>
+
 
         <Menu isOpen={isMenuOpen} onClose={handleMenuClose}>
           <MenuButton
@@ -404,8 +404,8 @@ export const Taglist = () => {
           <Flex width="full" height="full" alignItems="center" justifyContent="center" direction="column">
             <Icon as={BiFolderPlus} boxSize="40" color="gray.600" />
             <Text alignContent="center" color="#121212" fontSize="16px">Your first time?</Text>
-<Text alignContent="center" color="#121212" fontSize="16px">
-Create a new tag and lets begin</Text>
+            <Text alignContent="center" color="#121212" fontSize="16px">
+              Create a new tag and lets begin</Text>
           </Flex>
         ) : (
           <div

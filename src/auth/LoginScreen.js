@@ -1,10 +1,13 @@
 import { useState, React } from 'react';
-import { Link } from "react-router-dom";
-import axios from 'axios';
 import { Box } from '@chakra-ui/react';
 import { useToast, HStack, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import qs from 'qs';
+import { useDispatch, useSelector } from 'react-redux';
+import {loginUser,saveUserCredentials} from '../redux/reducers/authSlice';
+
+
+const dispatch = useDispatch();
+const loading = useSelector((state) => state.auth.loading);
 
 function LoginScreen() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -18,80 +21,49 @@ function LoginScreen() {
   const [password, setPassword] = useState("");
   const toast = useToast()
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const saveCredentials = (token, email, org_name) => {
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('email', email);
-    localStorage.setItem('org_name', org_name);
-  };
-  const login = async (e) => {
+  const loading = useSelector((state) => state.auth.loading);
+
+  const login = (e) => {
     e.preventDefault();
-
     if (email.trim() !== '' && password.trim() !== '') {
-      setIsLoading(true)
-      try {
-        axios.post(
-          'https://databoard-service.onrender.com/auth/login',
-          qs.stringify({
-            username: email,
-            password: password,
-          }
-          ),
-          {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-          }
-        ).then(function (response) {
-          // Handle response from API
-          // response=JSON.stringify(response.data)
+      const credentials = new URLSearchParams();
+      credentials.append('username', email);
+      credentials.append('password', password);
 
-          const responseData = response.data;
-          const status = responseData.status_code;
-          if (status === 200) {
+      dispatch(loginUser(credentials))
+        .then((response) => {
+          const statusCode = response.meta.status;
+          const responseData = response.payload.data;
+          if (statusCode === 200) {
+            const accessToken = responseData.access_token;
+            const userEmail = responseData.user.email;
+            const orgName = responseData.user.org_name;
 
-            // console.log("This is the access_token: "+JSON.stringify(responseData.data.access_token))
-            saveCredentials(responseData.data.access_token, responseData.data.user.email, responseData.data.user.org_name)
-            const message = responseData.message;
-
-            // login successful
-            toast({
-              position: 'top-right',
-              render: () => (
-                <Box color='white' p={3} bg='green.500' borderRadius="md">
-                  {message}
-                </Box>
-              ),
-            })
-            setIsLoading(false)
+            // Dispatch the action to save the credentials
+            dispatch(saveUserCredentials({ accessToken, userEmail, orgName }));
             navigate('/taglist');
+
           } else {
-            const message = responseData.detail && responseData.detail.message;
             toast({
               position: 'top-right',
               render: () => (
                 <Box color='white' p={3} bg='red.500' borderRadius="md">
-                  {message}
+                  <Text>Invalid credentials</Text>
                 </Box>
               ),
             })
-            setIsLoading(false)
           }
-
+          // ... other logic
+        }).catch((error) => {
+          toast({
+            position: 'top-right',
+            render: () => (
+              <Box color='white' p={3} bg='red.500' borderRadius="md">
+                <Text>Something went wrong: {error}</Text>
+              </Box>
+            ),
+          })
         });
-
-
-      } catch (error) {
-        toast({
-          position: 'top-right',
-          render: () => (
-            <Box color='white' p={3} bg='red.500' borderRadius="md">
-              Something went wrong {error}
-            </Box>
-          ),
-        })
-        setIsLoading(false)
-      }
     } else {
       toast({
         position: 'top-right',
@@ -102,7 +74,8 @@ function LoginScreen() {
         ),
       })
     }
-  }
+  };
+
 
   return (
 
@@ -154,8 +127,8 @@ function LoginScreen() {
 
 
                 </div>
-                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" type="button" onClick={login}>
-                  {isLoading ? (
+                <button className="bg-databoard-blue w-full hover:bg-blue-700 text-white h-15 font-bold py-4 px-4 rounded focus:outline-none focus:shadow-outline" disabled={loading} type="button" onClick={login}>
+                  {loading ? (
                     <div className="flex justify-center items-center">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
                     </div>

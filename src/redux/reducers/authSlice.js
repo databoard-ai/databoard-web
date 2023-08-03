@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 
-export const fetchTags = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue }) => {
-  const { access_token } = getState().auth.credentials;
+export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await axios.post('https://databoard-service.onrender.com/tags/fetch_all', credentials, {
+    const response = await axios.post('https://databoard-service.onrender.com/auth/login', credentials, {
       headers: {
-        'Authorization': `Bearer ${access_token}`
+        'Content-Type': 'application/x-www-form-urlencoded'
       }
     });
     return response.data;
@@ -15,31 +14,37 @@ export const fetchTags = createAsyncThunk('auth/loginUser', async (credentials, 
   }
 });
 
-const tagsSlice = createSlice({
-  name: "fetch_tags",
+const authSlice = createSlice({
+  name: "auth",
   initialState: {
-    tags: [],
+    user: null,
     loading: false,
     error: null,
     credentials: null, 
   },
   reducers: {
-   
+    logOutUser: (state) => {
+      state.user = null;
+    },
+    saveCredentials: (state, action) => {
+      state.credentials = action.payload;
+    },
+
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTags.pending, (state) => {
+      .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchTags.fulfilled, (state, action) => {
+      .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.tags = action.payload;
+        state.user = action.payload;
         state.error = null;
       })
-      .addCase(fetchTags.rejected, (state, action) => {
+      .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.tags = [];
+        state.user = null;
         state.error = action.payload.detail && action.payload.detail.message;
       });
   },
@@ -49,5 +54,5 @@ export const saveUserCredentials = (credentials) => {
     dispatch(saveCredentials(credentials));
   };
 };
-export const { logoutUser } = loginSlice.actions;
+export const { logOutUser } = loginSlice.actions;
 export default loginSlice.reducer;
