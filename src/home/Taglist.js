@@ -10,7 +10,6 @@ import axios from "axios";
 import { BsInfoCircle } from 'react-icons/bs';
 import DatePicker from '../components/DatePicker.js';
 import TimePicker from "../components/TimePicker.js";
-import { useDispatch, useSelector } from 'react-redux';
 import fetchTags from '../redux/reducers/tagsSlice';
 
 

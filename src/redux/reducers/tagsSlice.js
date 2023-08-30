@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 
-export const fetchTags = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue }) => {
+export const fetchTags = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue },getState) => {
   const { access_token } = getState().auth.credentials;
   try {
     const response = await axios.post('https://databoard-service.onrender.com/tags/fetch_all', credentials, {
@@ -44,10 +44,6 @@ const tagsSlice = createSlice({
       });
   },
 });
-export const saveUserCredentials = (credentials) => {
-  return (dispatch) => {
-    dispatch(saveCredentials(credentials));
-  };
-};
-export const { logoutUser } = loginSlice.actions;
-export default loginSlice.reducer;
+
+export const { logoutUser } = tagsSlice.actions;
+export default tagsSlice.reducer;

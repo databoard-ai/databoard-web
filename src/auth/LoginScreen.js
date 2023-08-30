@@ -1,15 +1,15 @@
-import { useState, React } from 'react';
+import { useState, React,useSelector } from 'react';
+import { useDispatch } from 'react-redux';
 import { Box } from '@chakra-ui/react';
 import { useToast, HStack, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import {loginUser,saveUserCredentials} from '../redux/reducers/authSlice';
 
 
-const dispatch = useDispatch();
-const loading = useSelector((state) => state.auth.loading);
+
 
 function LoginScreen() {
+  const dispatch = useDispatch();
   const [rememberMe, setRememberMe] = useState(false);
 
   function handleRememberMeToggle() {

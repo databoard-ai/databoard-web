@@ -2,10 +2,13 @@
 
 import './style/App.css';
 import LoginScreen from './auth/LoginScreen';
+import { Provider } from 'react-redux';
 function App() {
   return (
   
-      <LoginScreen />
+     <Provider>
+       <LoginScreen />
+     </Provider>
   );
 }
 

@@ -51,8 +51,8 @@ const authSlice = createSlice({
 });
 export const saveUserCredentials = (credentials) => {
   return (dispatch) => {
-    dispatch(saveCredentials(credentials));
+    dispatch(authSlice.reducer.saveCredentials(credentials));
   };
 };
-export const { logOutUser } = loginSlice.actions;
-export default loginSlice.reducer;
+export const { logOutUser } = authSlice.actions;
+export default authSlice.reducer;
