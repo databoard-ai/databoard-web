@@ -38,6 +38,7 @@ function HomeScreen() {
             textColor={"white"}
             borderRadius={4}
             _hover={{ textDecoration: "underline", bgColor: "#4278E4" }}
+           className=" shadow-2xl "
           >
             Get Started
           </Button>
@@ -76,6 +77,8 @@ function HomeScreen() {
             textColor={"white"}
             borderRadius={4}
             _hover={{ textDecoration: "underline" }}
+           className=" shadow-2xl "
+
           >
              Meet Clocker
           </Button>
