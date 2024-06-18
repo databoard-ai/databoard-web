@@ -1,11 +1,9 @@
-import logo from './logo.svg';
+import HomeScreen from './HomeScreen';
 
-import './App.css';
-import LoginScreen from './LoginScreen';
+
 function App() {
   return (
-  
-      <LoginScreen />
+    <HomeScreen/>
   );
 }
 

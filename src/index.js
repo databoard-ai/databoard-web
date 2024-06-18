@@ -1,16 +1,20 @@
+// src/index.js
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ChakraBaseProvider } from '@chakra-ui/react'
+import { ChakraBaseProvider } from '@chakra-ui/react';
 import { DataboardTheme } from './style/theme';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+
 import LoginScreen from './LoginScreen';
 import ResetPasswordScreen from './ResetpasswordScreen';
 import RegistrationForm from './RegistrationForm';
 import CreateTag from './CreateTag';
 import { Clocks } from './Tagdetails';
-import {Taglist} from './Taglist'
+import { Taglist } from './Taglist';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -21,17 +25,17 @@ import ErrorBoundary from './ErrorBoundary';
 const router = createBrowserRouter([
   {
     path: "/",
-    element:(
+    element: (
       <ErrorBoundary>
-         <App />
+        <App />
       </ErrorBoundary>
     ),
   },
   {
     path: "/login",
-    element:(
+    element: (
       <ErrorBoundary>
-         <LoginScreen />
+        <LoginScreen />
       </ErrorBoundary>
     ),
   },
@@ -61,23 +65,27 @@ const router = createBrowserRouter([
   },
   {
     path: "/register",
-    element: (<ErrorBoundary>
-      <RegistrationForm />
-    </ErrorBoundary>),
+    element: (
+      <ErrorBoundary>
+        <RegistrationForm />
+      </ErrorBoundary>
+    ),
   },
   {
     path: "/reset-password",
-    element: (<ErrorBoundary>
-      <ResetPasswordScreen />
-    </ErrorBoundary>),
+    element: (
+      <ErrorBoundary>
+        <ResetPasswordScreen />
+      </ErrorBoundary>
+    ),
   },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <ChakraBaseProvider theme={DataboardTheme}>
-  <RouterProvider router={router}/>
-  </ChakraBaseProvider>
+    <ChakraBaseProvider theme={DataboardTheme}>
+      <RouterProvider router={router} />
+    </ChakraBaseProvider>
 );
 
 reportWebVitals();
