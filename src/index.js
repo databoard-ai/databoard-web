@@ -8,13 +8,6 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-
-import LoginScreen from './LoginScreen';
-import ResetPasswordScreen from './ResetpasswordScreen';
-import RegistrationForm from './RegistrationForm';
-import CreateTag from './CreateTag';
-import { Clocks } from './Tagdetails';
-import { Taglist } from './Taglist';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -28,54 +21,6 @@ const router = createBrowserRouter([
     element: (
       <ErrorBoundary>
         <App />
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: "/login",
-    element: (
-      <ErrorBoundary>
-        <LoginScreen />
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: "/taglist",
-    element: (
-      <ErrorBoundary>
-        <Taglist />
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: "/tagdetails/:tag_id",
-    element: (
-      <ErrorBoundary>
-        <Clocks />
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: "/create-tag",
-    element: (
-      <ErrorBoundary>
-        <CreateTag />
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: "/register",
-    element: (
-      <ErrorBoundary>
-        <RegistrationForm />
-      </ErrorBoundary>
-    ),
-  },
-  {
-    path: "/reset-password",
-    element: (
-      <ErrorBoundary>
-        <ResetPasswordScreen />
       </ErrorBoundary>
     ),
   },

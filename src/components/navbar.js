@@ -78,7 +78,7 @@ function Navbar() {
                 Company
               </Text>
             </NavLink>
-            <NavLink to="/contact">
+            <NavLink to="https://clocker.databoard.ai/about_us">
               <Text
                 fontFamily="'Clash Display', sans-serif"
                 margin={'5px'}
@@ -142,7 +142,7 @@ function Navbar() {
                 Company
               </Text>
             </NavLink>
-            <NavLink to="/contact">
+            <NavLink to="https://clocker.databoard.ai">
               <Text
                 _hover={{ cursor: 'pointer', color: '#4283E4' }}
               >
