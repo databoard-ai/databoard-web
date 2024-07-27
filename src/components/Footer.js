@@ -1,14 +1,15 @@
-import {   
-    Box,
-    Flex,
-    HStack,
-    Icon,
-    Image,
-    Stack,
-    Text,
-    VStack,} from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  HStack,
+  Icon,
+  Image,
+  Stack,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import logo from '../assets/DataboardLogo.svg';
-import {FaFacebook, FaInstagram , FaLinkedin} from 'react-icons/fa'
+import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa'
 
 import { NavLink } from "react-router-dom";
 
@@ -25,7 +26,7 @@ function Footer() {
       py={{ base: "2em", md: "3em" }}
       px={{ base: "1em", md: "em" }}
     >
-          <Stack
+      <Stack
         direction={{ base: "column", md: "row" }}
         // alignItems="center"
         justifyContent="space-between"
@@ -47,10 +48,10 @@ function Footer() {
             // display="flex"
             justifyContent={{ base: "start", md: "start" }}
           >
-           <Image 
-         marginRight={'auto'}
-         src={logo} />
-          <Box
+            <Image
+              marginRight={'auto'}
+              src={logo} />
+            <Box
               position={'relative'}
               width={{ base: '100%', md: '260px' }}
             >
@@ -63,22 +64,22 @@ function Footer() {
             </Box>
           </VStack>
           <HStack gap="10">
-          <NavLink to="https://twitter.com/databoard_ai">
-            <Icon
-              as={FaFacebook}
-              w={6}
-              h={6}
-              my={{ base: "1.5", md: "0em" }}
-              color = "#FF4D00"
-            />
-          </NavLink>
+            <NavLink to="https://twitter.com/databoard_ai">
+              <Icon
+                as={FaFacebook}
+                w={6}
+                h={6}
+                my={{ base: "1.5", md: "0em" }}
+                color="#FF4D00"
+              />
+            </NavLink>
             <NavLink to="https://www.instagram.com/clocker.app">
               <Icon
                 as={FaInstagram}
                 w={6}
                 h={6}
                 my={{ base: "1.5", md: "0em" }}
-                color = "#FF4D00"
+                color="#FF4D00"
               />
             </NavLink>
             {/* <NavLink to="https://twitter.com/databoard_ai">
@@ -92,15 +93,15 @@ function Footer() {
               />
             </NavLink> */}
             <NavLink to="https://twitter.com/databoard_ai">
-            
-            <Icon
-            
-              as={FaLinkedin}
-              w={6}
-              h={6}
-              my={{ base: "1.5", md: "0em" }}
-              color = "#FF4D00"
-            />
+
+              <Icon
+
+                as={FaLinkedin}
+                w={6}
+                h={6}
+                my={{ base: "1.5", md: "0em" }}
+                color="#FF4D00"
+              />
             </NavLink>
           </HStack>
           {/* <Spacer py="1em" /> */}
@@ -122,7 +123,7 @@ function Footer() {
             >
               <NavLink to='https://clocker.databoard.ai/about_us'>
 
-              About us
+                About us
               </NavLink>
             </Text>
           </VStack>
@@ -154,7 +155,7 @@ function Footer() {
               my={{ base: "1.5", md: "0em" }}
             >
               <NavLink to='/pricing'>
-              Pricing
+                Pricing
               </NavLink>
             </Text>
           </VStack>
@@ -170,7 +171,7 @@ function Footer() {
               my={{ base: "1.5", md: "0em" }}
             >
               <NavLink to='/terms-of-service'>
-              Terms of Service
+                Terms of Service
               </NavLink>
             </Text>
           </VStack>
@@ -180,21 +181,21 @@ function Footer() {
             alignItems={{ base: "start", md: "end" }}
           >
             <Flex
-            flexDir={"column"}
+              flexDir={"column"}
             >
-            <Text
-              fontSize={{ base: "md", md: "md" }}
-              fontWeight="bolder"
-              _hover={{ textDecoration: "underline" }}
-              my={{ base: "1.5", md: "0em" }}
-              textAlign={"start"}
-              
-            >
-              <NavLink to='/privacy'>
-              Privacy
-              </NavLink>
+              <Text
+                fontSize={{ base: "md", md: "md" }}
+                fontWeight="bolder"
+                _hover={{ textDecoration: "underline" }}
+                my={{ base: "1.5", md: "0em" }}
+                textAlign={"start"}
 
-            </Text>
+              >
+                <NavLink to='/privacy'>
+                  Privacy
+                </NavLink>
+
+              </Text>
             </Flex>
           </VStack>
           <VStack
@@ -209,12 +210,14 @@ function Footer() {
               my={{ base: "1.5", md: "0em" }}
             >
               <NavLink to='#'>
-              Get in Touch
+                Get in Touch
               </NavLink>
             </Text>
-                 <ul className=" mt-[15px] md:mt-[10px] sm:items-start md:items-start  text-md font-medium">
-               <li>
-                <a className="underline font-bold">info@databoard.ai</a>
+            <ul className=" mt-[15px] md:mt-[10px] sm:items-start md:items-start  text-md font-medium">
+              <li>
+                <a href="mailto:info@databoard.ai" className="underline font-bold">
+                  info@databoard.ai
+                </a>
               </li>
             </ul>
           </VStack>
